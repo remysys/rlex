@@ -1,4 +1,5 @@
-#ifndef __HASH_H
+#ifndef _HASH_H
+#define _HASH_H
 
 typedef struct BUCKET {
   struct BUCKET *next;

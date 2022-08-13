@@ -32,7 +32,6 @@ HASH_TAB *maketab(unsigned int maxsym, unsigned int (*hash)(), int (*cmp)())
   if (!p) {
     fprintf(stderr, "can't get memory\n");
     exit(1);
-    return NULL;
   }
   p->size = maxsym;
   p->numsyms = 0;
@@ -153,6 +152,14 @@ int ptab(HASH_TAB *tabp, ptab_t print, void *param, int sort)
   return 1;
 }
 
+unsigned int hash_add(unsigned char *name)
+{
+  unsigned int h ;
+  for(h = 0; *name ; h += *name++)
+    ;
+  return h;
+}
+
 #ifdef  MAIN
 /*----------------------------------------------------------------------
  * The following test routines exercise the hash functions by building a table
@@ -171,14 +178,6 @@ typedef struct
   unsigned int  hval;	    /* hash value of name, also "	*/
   int	          count;	  /* # of times word was encountered */
 } STAB;
-
-unsigned int hash_add(unsigned char *name)
-{
-  unsigned int h ;
-  for(h = 0; *name ; h += *name++)
-    ;
-  return h;
-}
 
 void printword(void *sp, ...) {
   printf("name: %s\tstr: %s\thval: %u\n", ((STAB *)sp)->name, ((STAB *)sp)->str, ((STAB *)sp)->hval);
