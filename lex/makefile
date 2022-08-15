@@ -16,6 +16,8 @@ esc.o: esc.c
 	gcc $(CFLAGS) -c $^ -o $@
 egrep.o: egrep.c
 	gcc $(CFLAGS) -c $^ -o $@
+dfa.o: dfa.c
+	gcc $(CFLAGS) -c $^ -o $@
 
 
 test: hash nfa set egrep 

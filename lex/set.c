@@ -311,7 +311,7 @@ void pset(SET *set, pset_t output_routine, void *param) {
       count++;
       (*output_routine)(param, "%d ", i);
     }
-    (*output_routine)(param, "\n", i);
+
     next_member(NULL);
     if (!count) {
       (*output_routine)(param, "empty\n", -2);

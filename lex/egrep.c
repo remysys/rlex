@@ -56,6 +56,7 @@ SET *e_closure(SET *input, char **accept, int *anchor)
     }
 
     *accept = NULL;
+    *anchor = 0;
     accept_num = MAX_INT;
 
     sp = &stack[-1];
