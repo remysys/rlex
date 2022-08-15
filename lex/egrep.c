@@ -8,7 +8,7 @@
 #define MAX_INT (int)(((unsigned)(~0)) >> 1)
 
 NFA *Nfa; /* base address of NFA array */
-int Nfa_states; /* number of states in NFA */
+int Num_states; /* number of states in NFA */
 
 int nfa(char* (*input_function) (void)) 
 {
@@ -20,7 +20,7 @@ int nfa(char* (*input_function) (void))
      */
 
      NFA *sstate;
-     Nfa = thompson(input_function, &Nfa_states, &sstate);
+     Nfa = thompson(input_function, &Num_states, &sstate);
 
      return (sstate - Nfa);
 }
@@ -59,7 +59,7 @@ SET *e_closure(SET *input, char **accept, int *anchor)
     accept_num = MAX_INT;
 
     sp = &stack[-1];
-    for(next_member(NULL); (i = next_member(input)) > 0; ) {
+    for(next_member(NULL); (i = next_member(input)) >= 0; ) {
       *++sp = i;
     }
 
@@ -106,7 +106,7 @@ SET *move(SET *inp_set, int c)
   NFA *p;
   SET *outset = NULL;
 
-  for (i = Nfa_states; --i >= 0; ) {
+  for (i = Num_states; --i >= 0; ) {
     if (MEMBER(inp_set, i)) {
       p = &Nfa[i];
       if (p->edge == c || (p->edge == CCL && TEST(p->bitset, c))) {
@@ -121,6 +121,7 @@ SET *move(SET *inp_set, int c)
   return outset;
 }
 
+#ifdef MAIN
 #include "globals.h"
 
 #define BSIZE 256
@@ -158,7 +159,7 @@ char *get_regex (void)
 
 int main(int argc, char *argv[]) 
 {
-  if (argc != 3) {
+  if (argc != 2) {
     fprintf(stderr, "usage: egrep pattern <input");
     exit(1);
   }
@@ -170,6 +171,7 @@ int main(int argc, char *argv[])
   int anchor;
   int c;
 
+   Verbose = 2;
 
   /*  1: compile the NFA; initialize move() & e_closure().
       *  2: create the initial state, the set of all NFA states that can
@@ -181,10 +183,10 @@ int main(int argc, char *argv[])
   
   Expr = argv[1];
   sstate = nfa(get_regex);
-
+  
   start_dfastate = newset();
   ADD(start_dfastate, sstate);
-
+  
   if (!e_closure(start_dfastate, &accept, &anchor)) {
     fprintf(stderr, "internal error: state machine is empty\n");
     exit(1);
@@ -202,20 +204,24 @@ int main(int argc, char *argv[])
     */
     
   while((c = nextchar())) {
-    next = e_closure(move(current, c), &accept, &anchor);
-    if (accept) {
-      printbuf(); /* accept */
-      if (next) {
-        delset(next);
+    if (next = e_closure(move(current, c), &accept, &anchor)) {
+      if (accept) {
+        printbuf();
+      } else {
+        delset(current);
+        current = next;
+        continue;
       }
-      ASSIGN(current, start_dfastate);
-    } else {
-      delset(current);
-      current = next;
     }
+    if (next) {
+      delset(next);
+    }
+    ASSIGN(current, start_dfastate);
   }
 
   delset(current);
   delset(start_dfastate);
   return 0;
 }
+
+#endif 

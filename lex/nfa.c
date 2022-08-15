@@ -12,6 +12,18 @@
 
 /* make an nfa from a lex input file using thompson's construction */
 
+int  Verbose	        = 0 ;	      /* print statistics		   */
+int  No_lines         = 0 ;	      /* suppress #line directives	   */
+int  Unix		          = 0 ;	      /* use UNIX-style newlines       */
+int  Public	          = 0 ;	      /* make static symbols public    */
+char *Template        ="lex.par"; /* state-machine driver template */
+int  Actual_lineno    = 1 ;	      /* current input line number	   */
+int  Lineno	          = 1 ;	      /* line number of first line of  a multiple-line rule.	   */
+char Input_buf[MAXINP];		        /* line buffer for input	   */
+char *Input_file_name;		        /* input file name (for #line   */
+FILE *Ifile;			                /* input stream.		   */
+FILE *Ofile;			                /* output stream.		   */
+
 typedef enum ERR_NUM 
 {
   E_MEM,	    /* out of memory				                */
@@ -782,4 +794,5 @@ int main(int argc, char *argv[])
     nfa = thompson(getstr, &max_state, &start_state);
     return 0;
 }
+
 #endif

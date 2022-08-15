@@ -2,15 +2,15 @@
 
 #define MAXINP	2048			        /* maximum rule size		   */
 
-int  Verbose	        = 0 ;	      /* print statistics		   */
-int  No_lines         = 0 ;	      /* suppress #line directives	   */
-int  Unix		          = 0 ;	      /* use UNIX-style newlines       */
-int  Public	          = 0 ;	      /* make static symbols public    */
-char *Template        ="lex.par"; /* state-machine driver template */
-int  Actual_lineno    = 1 ;	      /* current input line number	   */
-int  Lineno	          = 1 ;	      /* line number of first line of  a multiple-line rule.	   */
-char Input_buf[MAXINP];		        /* line buffer for input	   */
-char *Input_file_name;		        /* input file name (for #line   */
-FILE *Ifile;			                /* input stream.		   */
-FILE *Ofile;			                /* output stream.		   */
+extern int  Verbose;	        	      /* print statistics		   */
+extern int  No_lines;         	      /* suppress #line directives	   */
+extern int  Unix;		          	      /* use UNIX-style newlines       */
+extern int  Public;	          	      /* make static symbols public    */
+extern char *Template;         /* state-machine driver template */
+extern int  Actual_lineno;    	      /* current input line number	   */
+extern int  Lineno;	         	      /* line number of first line of  a multiple-line rule.	   */
+extern char Input_buf[MAXINP];		        /* line buffer for input	   */
+extern char *Input_file_name;		        /* input file name (for #line   */
+extern FILE *Ifile;			                /* input stream.		   */
+extern FILE *Ofile;			                /* output stream.		   */
 #endif
