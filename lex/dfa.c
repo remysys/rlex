@@ -36,7 +36,7 @@ int add_to_dstates(SET *NFA_set, char *accept_string, int anchor)
 {
   int nextstate;
 
-  if (Nstates > (MAX_DFA - 1)) {
+  if (Nstates > (DFA_MAX - 1)) {
     ferr("Too many DFA states\n");
   }
 
@@ -188,4 +188,3 @@ int dfa(char *(*input_function)(void), ROW **dfap, ACCEPT **acceptp)
 
   return Nstates;
 }
-

@@ -4,7 +4,7 @@
 #include "set.h"
 #include "dfa.h"
 #include "globals.h"
-
+#include "comm.h"
 
 /* minimize.c: make a minimal DFA by eliminating equivalent states */
 
@@ -19,7 +19,7 @@ void pgroups(int nstates) {
   SET **end = &Groups[Numgroups];
   for (current = Groups; current < end; ++current) {
     printf( "\tgroup %ld: {", (long)(current - Groups));
-    pset(*current, fprintf, (void*)stdout);
+    pset(*current, (pset_t)fprintf, (void*)stdout);
     printf( "}\n");
   }
   printf("\n");
@@ -46,7 +46,7 @@ void init_groups(int nstates, ACCEPT *accept)
     ADD(*last, i);
     Ingroup[i] = Numgroups++;
     ++last;
-match:    /* group already exists, keep going */
+match:;    /* group already exists, keep going */
   }
 
   if (Verbose > 1) {
@@ -136,7 +136,7 @@ void minimize(int nstates, ROW **dfap, ACCEPT **acceptp)
 
           if ((goto_next != goto_first) && (goto_first == F || goto_next == F || Ingroup[goto_first] != Ingroup[goto_next])) {
             REMOVE(*current, next);
-            ADD(new, next);
+            ADD(*new, next);
             Ingroup[next] = Numgroups;
             break;
           }
@@ -159,7 +159,6 @@ void minimize(int nstates, ROW **dfap, ACCEPT **acceptp)
   fix_dtran(dfap, acceptp);
 }
 
-
 int min_dfa(char *(*input_function)(void), ROW **dfap, ACCEPT **acceptp) 
 {
   /* make a minimal DFA, eliminating equivalent states. Return the number of
@@ -171,6 +170,29 @@ int min_dfa(char *(*input_function)(void), ROW **dfap, ACCEPT **acceptp)
   Numgroups = 0;
   nstates = dfa(input_function, dfap, acceptp);
   minimize(nstates, dfap, acceptp);
-  
+
   return Numgroups;
+}
+
+char *getstr()
+{
+  static char bufs[80];
+  printf("%d: ", Lineno++);
+  if (fgets(bufs, NUMELE(bufs), stdin)) {
+      return bufs;
+  } else {
+      return NULL;
+  }
+}
+
+int main(int argc, char *argv[])
+{
+  int	   nstates;		
+  ROW	   *dtran;		
+  ACCEPT *accept;		
+  int	   i;
+  Verbose = 2;
+
+  nstates = min_dfa(getstr, &dtran, &accept );
+  printf("nstates: %d\n", nstates);
 }

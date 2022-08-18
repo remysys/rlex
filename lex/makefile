@@ -18,7 +18,14 @@ egrep.o: egrep.c
 	gcc $(CFLAGS) -c $^ -o $@
 dfa.o: dfa.c
 	gcc $(CFLAGS) -c $^ -o $@
-
+squash.o: squash.c
+	gcc $(CFLAGS) -c $^ -o $@
+tools.o: tools.c
+	gcc $(CFLAGS) -c $^ -o $@
+minimize.o: minimize.c 
+	gcc $(CFLAGS) -c $^ -o $@
+print.o: print.c 
+	gcc $(CFLAGS) -c $^ -o $@
 
 test: hash nfa set egrep 
 
@@ -31,6 +38,9 @@ set: set.o
 nfa: nfa.o set.o hash.o printnfa.o esc.o
 	gcc -o $@ $^
 
+dfa: dfa.o nfa.o set.o hash.o printnfa.o esc.o squash.o tools.o minimize.o egrep.o print.o
+	gcc -o $@ $^
+
 egrep: egrep.o nfa.o set.o hash.o printnfa.o esc.o
 	gcc -o $@ $^
 
@@ -40,3 +50,4 @@ clean:
 	rm -fr nfa
 	rm -fr set
 	rm -fr egrep
+	rm -fr dfa

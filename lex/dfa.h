@@ -1,11 +1,3 @@
-#ifndef _DFA_H
-/*@A (C) 1992 Allen I. Holub                                                */
-/*--------------------------------------------------------------
- * DFA.H: The following definitions are used in dfa.c and in
- * minimize.c to represent DFA's.
- *--------------------------------------------------------------
- */
-
 #ifndef __DFA_H
 #define __DFA_H
 
@@ -25,10 +17,21 @@ typedef struct ACCEPT
 } ACCEPT;
 
 SET *e_closure(SET *input, char **accept, int *anchor);   /* egerp.c */
-void free_nfa()                                           /* egerp.c */
-SET *move(SET *inp_set, int c)                            /* egrep.c */
+void free_nfa();                                          /* egerp.c */
+SET *move(SET *inp_set, int c);                           /* egrep.c */
 int nfa(char* (*input_function) (void));                  /* egrep.c */
 
 int dfa( char *(*input_function)(void), ROW **dfap,  ACCEPT**	acceptp);          /* dfa.c   */
+
+void pheader(FILE *fp, ROW dtran[], int nrows, ACCEPT *accept); /* print.c */
+void pdriver(FILE *output, int nrows, ACCEPT *accept);          /* print.c */
+
+void lerror(int status, char *fmt, ...);       /* lex.c */
+int main(int argc, char *argv[]);             /* lex.c */
+
+char *get_expr();          /* input.c */
+
+int squash(FILE *fp, ROW *dtran, int nrows, int ncols, char *name);  /* squash.c */
+void cnext(FILE *fp, char *name);                                    /* squash.c */
 
 #endif

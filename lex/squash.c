@@ -2,10 +2,11 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include "set.h"
 #include "comm.h"
 #include "dfa.h"
 #include "globals.h"
-#include "set.h"
+#include "tools.h"
 
 /* squash.c -- this module contains the routines to compress a table
  * horizontally and vertically by removing redundant columns and rows, and then
@@ -14,8 +15,8 @@
 
 
 #define NCOLS	16
-#define TYPE	 "YY_TTYPE"  /* Declared type of output tables.		*/
-#define SCLASS   "YYPRIVATE" /* Storage class of all the tables		*/
+#define TYPE	 "YY_TTYPE"     /* declared type of output tables.		*/
+#define SCLASS   "YYPRIVATE"  /* storage class of all the tables		*/
 
 int Col_map[MAX_CHARS];
 int Row_map[DFA_MAX];
@@ -141,8 +142,7 @@ void reduce(ROW *dtran, int *p_nrows, int *p_ncols)
 
 void pmap(FILE *fp, int *p,  int n )
 {
-    /*print a one-dimensional array */
-
+  /*print a one-dimensional array */
   int i;
   for (i = 0; i < (n - 1); i++) {
 	  fprintf(fp, "%3d," , *p++);
@@ -207,9 +207,7 @@ int squash(FILE *fp, ROW *dtran, int nrows, int ncols, char *name)
         + (oncols * sizeof(TTYPE));      /* col map */
 }
 
-    
-  
-void	cnext(FILE *fp, char *name)
+void cnext(FILE *fp, char *name)
 {
   /* print out a yy_next(state,c) subroutine for the compressed table */
 
@@ -220,5 +218,5 @@ void	cnext(FILE *fp, char *name)
   };
 
   comment(fp, text);
-  fprintf(fp, "#define yy_next(state,c) (%s[ Yy_rmap[state] ][ Yy_cmap[c] ])\n", name);
+  fprintf(fp, "#define yy_next(state,c) (%s[Yy_rmap[state]][Yy_cmap[c]])\n", name);
 }
