@@ -589,7 +589,7 @@ void cat_expr(NFA **startp, NFA **endp)
     /* the same translations that were needed in the expr rules are needed again
      * here:
      *
-     *	cat_expr  -> cat_expr | factor
+     *	cat_expr  -> cat_expr factor
      *		     factor
      *
      * is translated to:
@@ -616,9 +616,10 @@ void cat_expr(NFA **startp, NFA **endp)
 
 int first_in_cat(TOKEN tok) {
     switch (tok) {
+        case CLOSE_PAREN:
         case AT_EOL: 
         case OR:
-        case EOS: return 0;   
+        case EOS: return 0;  
     }
 
     return 1;

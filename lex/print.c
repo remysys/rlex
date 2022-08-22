@@ -5,6 +5,7 @@
 #include "nfa.h"
 #include "dfa.h"
 #include "globals.h"
+#include "tools.h"
 
 /* print.c:  this module contains miscellaneous print routines that do
  * everything except print the actual tables.
