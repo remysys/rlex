@@ -67,3 +67,54 @@ void pheader(FILE *fp, ROW dtran[], int nrows, ACCEPT *accept)
 }
 
 
+
+void pdriver(FILE *output, int nrows, ACCEPT *accept)
+{
+  /* nrows: number of states in dtran[] 
+   * accept: set of accept states in dtran[] 
+   * print the array of accepting states, the driver itself, and the case
+   * statements for the accepting strings
+   */
+
+  int i;
+  static  char  *text[] = {
+    "the Yyaccept array has two purposes. If Yyaccept[i] is 0 then state",
+    "i is nonaccepting. If it's nonzero then the number determines whether",
+    "the string is anchored, 1=anchored at start of line, 2=at end of",
+    "line, 3=both, 4=line not anchored",
+    NULL
+  };
+
+  comment(output, text);
+  fprintf(output, "YYPRIVATE YY_TTYPE Yyaccept[] =\n");
+  fprintf(output, "{\n");
+
+  for (i = 0; i < nrows; i++) { /*accepting array */
+    if (!accept[i].string) {
+      fprintf(output, "\t0  ");
+    } else {
+      fprintf(output, "\t%-3d",accept[i].anchor ? accept[i].anchor : 4);
+      fprintf(output, "%c    /* state %-3d */\n", i == (nrows -1) ? ' ' : ',' , i);
+    }
+  }
+
+  fprintf(output, "};\n\n");
+
+  driver_2(output, !No_lines); /* code above cases */
+
+  for (i = 0; i < nrows; i++) { /* case statements */
+    if (accept[i].string) {
+      fprintf(output, "\t\tcase %d:\t\t\t\t\t/* state %-3d */\n",i, i);
+      if (!No_lines) {
+        fprintf(output, "#line %d \"%s\"\n", *((int *)(accept[i].string) - 1), Input_file_name);
+      }
+
+      fprintf(output, "\t\t  %s\n", accept[i].string);
+      fprintf(output, "\t\t  break;\n");
+    }
+  }
+
+  driver_2(output, !No_lines); /* code below cases */
+}
+
+

@@ -19,6 +19,7 @@
 typedef unsigned char YY_TTYPE;
 #define YYF (YY_TTYPE)(-1))
 
+?
 @----------------------------------------------------------------------
 @
 @	the tables, etc. go here.
@@ -147,6 +148,7 @@ yylex() {
         yylineno = ii_lineno();
 
         switch(yylastaccept) {
+?
           @		   +-----------------------------------------------------------+
           @		   | The case statements associated with the accepting strings |
           @		   | go here						       |
