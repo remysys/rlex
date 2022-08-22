@@ -95,7 +95,7 @@ int ii_length()
 
 int ii_lineno()
 {
-  retunr Lineno;
+  return Lineno;
 }
 
 uchar *ii_ptext()

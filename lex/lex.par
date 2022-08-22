@@ -1,0 +1,173 @@
+/* this file contains the lex state-machine driver */
+
+/* YY_TTYPE is used for the DFA transition table: Yy_nxt[], declared below.
+ * YYF marks failure transitions in the DFA transition table. there's no failure
+ * state in the table itself, these transitions must be handled by the driver
+ * program. the DFA start state is State 0. YYPRIVATE is only defined here only
+ * if it hasn't be #defined earlier. i'm assuming that if NULL is undefined,
+ * <stdio.h> hasn't been included.
+ */
+
+#include <stdio.h>
+#include "input.h"	 /* prototoyptes for the ii_ functions */
+
+
+#ifndef YYPRIVATE
+#define YYPRIVATE static
+#endif
+
+typedef unsigned char YY_TTYPE;
+#define YYF (YY_TTYPE)(-1))
+
+@----------------------------------------------------------------------
+@
+@	the tables, etc. go here.
+@
+@----------------------------------------------------------------------
+
+char  *yytext; 
+int   yyleng;
+int   yylineno;
+FILE *yyout = stdout;
+
+/*-----------------------------------------------------------------
+ * macros that duplicate functions in UNIX lex:
+ */
+#define output(c) putc(c, yyout)
+#define ECHO fprintf(yyout, "%s", yytext)
+
+#ifndef YYERROR
+#define YYERROR printf
+#endif
+
+#define yymore() yymoreflg = 1
+#define unput(c) (ii_unput(c), --yyleng)
+
+#define yyless(n) (ii_unterm(), \
+                (yyleng -= ii_pushback(n) ? n : yyleng), \
+                ii_term()\
+                )
+
+
+int input(void) /* this is a macro in unix lex */
+{
+  int c;
+  if ((c = ii_input()) && (c != -1)) {
+    yytext = (char *) ii_text;
+    yylineno = ii_lineno();
+    ++yyleng;
+  }
+
+  return -1;
+}
+
+
+yylex() {
+  int yymoreflg;              /* set by yymore() */
+  static int yystate = -1;    /* current state */
+  int yylastaccept;           /* most recently seen accept state */
+  int yyprev;                 /* state before yylastaccept */
+  int yynstate;               /* next state, given lookahead */
+  int yylook;                 /* lookahead character */
+  int yyanchor;               /* anchor point for most recently seen accepting state */
+
+  if (yystate == -1) {
+    yy_init_lex(); /*one-time initializations */
+    ii_advance();
+    ii_pushback(1);
+  }
+  
+  yystate       = 0; /* top of loop initializations */
+  yylastaccept  = 0;
+  yymoreflg     = 0;
+  ii_unterm();
+  ii_mark_start();
+
+  while(1) {
+    /* check end of file. if there's an unprocessed accepting state,
+	   * yylastaccept will be nonzero. in this case, ignore EOF for now so
+	   * that you can do the accepting action; otherwise, try to open another
+	   * file and return if you can't.
+	   */
+
+    while(1) {
+      if ((yylook = ii_look(1)) != EOF) {
+        yynstate = yy_next(yystate, yylook);
+        break;
+      } else {
+        if (yylastaccept) {
+          yynstate = YYF;
+          break;
+        } else if (yywrap()) {
+          yytext = "";
+          yyleng = 0;
+          return 0;
+        } else {
+          ii_advance();
+          ii_pushback(1);
+        }
+      }
+    }
+        
+
+    if (yynstate != YYF) {
+      if (ii_advance() < 0) {
+        YYERROR("line %d, lexme too long. discarding extra characters\n", ii_lineno);
+        ii_flush(1);
+      }
+
+      if (yyanchor = Yyaccept[yynstate]) { /* saw an accept state */
+        yyprev = yystate;
+        yylastaccept = yynstate;
+        ii_mark_end(); /* mark input at current character. */
+                       /* a subsequent ii_to_mark() returns to this position */
+      }
+
+      yystate = yynstate;
+    } else {
+      if (!yylastaccept) {
+        #ifndef YYBADINP
+        YYERROR("ignoring bad input\n");  /* skip char that caused failure */
+        #endif
+        ii_advance();
+      } else {
+        ii_to_mark();       /* back up to previous accept state */
+
+        if (yyanchor & 2) { /* if end anchor is active */
+          ii_pushback(1);   /* push back the CR or LF */
+        }
+
+        if (yyanchor & 1) { /* if start anchor is active */
+          ii_move_start();  /* skip the leading newline */
+        }
+
+        ii_term();      /* null-terminate the string */
+        yytext = (char *)ii_text();
+        yyleng = ii_length();
+        yylineno = ii_lineno();
+
+        switch(yylastaccept) {
+          @		   +-----------------------------------------------------------+
+          @		   | The case statements associated with the accepting strings |
+          @		   | go here						       |
+          @		   +-----------------------------------------------------------+
+          @
+
+          default: 
+            YYERROR("internal error, yylex: unknown accept state: %d\n", yylastaccept);
+            break;
+        }
+        
+        ii_unterm();
+        yylastaccept = 0;
+        
+        if (!yymoreflg) {
+          yystate = 0;
+          ii_mark_start();
+        } else {
+          yystate = yyprev; /* back up */
+          yymoreflg = 0;
+        }
+      }
+  }
+}
