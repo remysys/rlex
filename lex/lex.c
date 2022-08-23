@@ -1,0 +1,311 @@
+#include <ctype.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "dfa.h"
+#include "globals.h"
+#include "nfa.h"
+
+#define DTRAN_NAME "Yy_nxt" /* name used for DFA transition table. up to 
+				                     * 3 characters are appended to the end of
+				                     * this name in the row-compressed tables.   */
+
+#define E(x)  fprintf(stderr, "%s\n", x);
+
+static int Column_compress = 1;   /* variables for command-line switches */
+static int No_compression  = 0;
+static int No_header       = 0;
+static int Header_only     = 0;
+
+#define VERSION "1.01 [gcc 4.8.5]"
+
+void signon()
+{
+  /* print the sign-on message. since the console is opened explicitly, the
+   * message is printed even if both stdout and stderr are redirected.
+   */
+  FILE *screen;
+  if (!(screen = fopen("/dev/tty", "w"))) {
+    screen = stderr;
+  }
+
+  fprintf(screen, "rlex %s [%s]. (c) %s, remysys.", VERSION, __DATE__,  __DATE__ + 7);
+  fprintf(screen," all rights reserved.\n");
+
+  if (screen != stderr) {
+    fclose(screen);
+  }
+}
+
+void cmd_line_error(int usage, char *fmt, ...)
+{
+  /* print an error message and exit to the operating system. this routine is
+   * used much like printf(), except that it has an extra first argument.
+   * if "usage" is 0, an error message associated with the current value of
+   * errno is printed after printing the format/arg string in the normal way.
+   * if "usage" is nonzero, a list of legal command-line switches is printed.
+   */
+
+  va_list args;
+  va_start(args, fmt);
+  fprintf(stderr, "rlex: ");
+  vfprintf(stderr, fmt, args);
+  if (!usage) {
+    perror("");
+  } else {
+    E("\n\nUsage is:     rleX [options] file");
+	  E("-f  for (f)ast. Don't compress tables");
+ 	  E("-h  suppress (h)eader comment that describes state machine");
+	  E("-H  print the (H)eader only");
+	  E("-l  Suppress #(l)ine directives in the output");
+	  E("-t  Send output to standard output instead of lexyy.c");
+	  E("-v  (v)erbose mode, print statistics");
+	  E("-V  More (V)erbose, print internal diagnostics as lex runs");
+  }
+  
+  va_end(args);
+  exit(1);
+}
+
+void lerror(int status, char *fmt, ...)
+{
+  /* print an error message and input line number. exit with
+   * indicated status if "status" is nonzero.
+   */
+  
+  va_list args;
+  va_start(args, fmt);
+  fprintf(stderr, "rlex, input line %d: ", Actual_lineno);
+  vfprintf(stderr, fmt, args);
+  va_end(args);
+
+  if (status) {
+    exit(status);
+  }
+}
+
+void strip_comments(char *string)
+{
+  /* scan through the string, replacing c-like comments with space
+   * characters. multiple-line comments are supported
+   */
+  
+  static int incomment = 0;
+  for (; *string; ++string) {
+    if (incomment) {
+      if (string[0] == '*' && string[1] == '/') {
+        incomment = 0;
+        *string++ = ' ';
+        *string = ' ';
+        continue;
+      }
+
+      if (!isspace(*string)) {
+        *string = ' ';
+      }
+
+    } else {
+      if (string[0] == '/' && string[1] == '*') {
+        incomment = 1;
+        *string++ = ' ';
+        *string = ' ';
+      }
+    }
+  }
+}
+
+/* head processes everything up to the first %%. any lines that begin
+ * with white space or are surrounded by %{ and %} are passed to the
+ * output. all other lines are assumed to be macro definitions.
+ * a %% can not be concealed in a %{ %} but it must be anchored at start
+ * of line so a %% in a printf statement (for example) is passed to the
+ * output correctly. similarly, a %{ and %} must be the first two characters
+ * on the line.
+ */
+
+void head(int suppress_output) 
+{
+  int transparent = 0; /* true if in a %{ %} block */
+  if (!suppress_output && Public) {
+    fputs("#define YYPRIVATE\n\n", Ofile);
+  }
+
+  if (!No_lines) {
+    fprintf( Ofile, "#line 1 \"%s\"\n", Input_file_name);
+  }
+
+  while (fgets(Input_buf, MAXINP, Ifile)) {
+    ++Actual_lineno;
+    if (!transparent) { /* Don't strip comments from code blocks */
+      strip_comments(Input_buf);
+    }
+
+    if (Verbose > 1) {
+      printf("h%d: %s", Actual_lineno, Input_buf);
+    }
+
+    if (Input_buf[0] == '%') {
+      if (Input_buf[1] == '%') {
+        if (!suppress_output) {
+          fputs("\n", Ofile);
+        }
+        break;
+      } else {
+        if (Input_buf[1] == '{') {
+          transparent = 1;
+        } else if (Input_buf[1] == '}') {
+          transparent = 0;
+        } else {
+          lerror(0, "ignoring illegal %%%c directive\n", Input_buf[1]);
+        }
+      }
+    } else if (transparent || isspace(Input_buf[0])) {
+      if (!suppress_output) {
+        fputs(Input_buf, Ofile);
+      }
+    } else {
+      new_macro(Input_buf);
+      if (!suppress_output) {
+        fputs("\n", Ofile); /* replace macro def with a blank 
+                             * line so that the line numbers 
+                             * won't get messed up.
+                             */
+      }
+    }
+  }
+
+  if (Verbose > 1) {
+    printmacs();
+  }
+}
+
+void tail()
+{
+  fgets(Input_buf, MAXINP, Ifile); /* throw away the line that had the %% on it */
+
+  if (!No_lines) {
+    fprintf(Ofile, "#line %d \"%s\"\n", Actual_lineno + 1, Input_file_name);
+  }
+
+  while (fgets(Input_buf, MAXINP, Ifile)) {
+    if (Verbose > 1) {
+      printf("t%d: %s", Actual_lineno++, Input_buf);
+    }
+
+    fputs(Input_buf, Ofile);
+  }
+}
+
+
+void defnext(FILE *fp, name)
+{
+  /* print the default yy_next(s,c) subroutine for an uncompressed table */
+  static char *comment_text[] = 
+  {
+    "yy_next(state,c) is given the current state and input character and",
+    "evaluates to the next state",
+    NULL
+  };
+
+  comment_text(fp, comment_text);
+  fprintf(fp, "#define yy_next(state, c)  (%s[state][c])\n", name);
+}
+
+int main(int argc, char *argv[])
+{
+  static char *p;
+  static int use_stdout = 0;
+  signon();
+
+  for (++argv, --argc; argc && *(p = *argv) == '-'; ++argv, --argc) {
+    while (*++p) {
+      switch (*p) {
+        case 'f': No_compression = 1; break;
+        case 'h': No_header = 1; break;
+        case 'H': Header_only = 1; break;
+        case 'l': No_lines = 1; break;
+        case 'p': Public = 1; break;
+        case 't': use_stdout = 1; break;
+        case 'v': Verbose = 1; break;
+        case 'V': Verbose = 2; break;
+        default: cmd_line_error(1, "-%c illegal argument", *p);
+          break;
+      }
+    }
+  }
+
+  if (argc > 1) {
+    cmd_line_error(1, "too many argments. only one file name permitted");
+  } else if (argc <= 0) {
+    cmd_line_error(1, "file name required");
+  } else { /* argc == 1 */
+    if (Ifile = fopen(*argv, "r")) {
+      Input_file_name = *argv;
+    } else {
+      cmd_line_error(0, "can't open input file %s", *argv);
+    }
+  }
+
+  if (!use_stdout) {
+    if (!(Ofile = fopen(Header_only ? "lexyy.h" : "lexyy.c", "w"))) {
+      cmd_line_error(0, "can't open output file lexyy.[ch]");
+    }
+  }
+
+  do_file();
+  fclose(Ofile);
+  fclose(Ifile);
+  exit(0);
+}
+
+void do_file()
+{
+  int nstates;    /* number of DFA states */
+  ROW *dtran;     /* transition table */
+  ACCEPT *accept; /* set of accept states in dfa */
+  int i;
+
+  /* process the input file */
+
+  head(Header_only);  /* print everything up to first %% */
+
+  nstates = min_dfa(get_expr, &dtran, &accept); /* make dfa */
+  
+  if (Verbose) {
+    printf("%d out of %d DFA states in minimized machine\n", nstates, DFA_MAX);
+	  printf("%d bytes required for minimized tables\n\n",
+		  nstates * MAX_CHARS * sizeof(TTYPE)		/* dtran  */
+	       + nstates * sizeof(TTYPE));		    /* accept */
+  }
+
+  if (!No_header) {
+    pheader(Ofile, dtran, nstates, accept) /* print header comment*/
+  }
+
+  if (!Header_only) {
+    /* first part of driver */
+    if (!driver_1(Ofile, !No_lines)) {
+      perror("lex.par");
+      exit(1);
+    }
+
+    if (!No_compression) {
+      fprintf(Ofile, "YYPRIVATE YY_TTYPE %s[%d][%d] = \n", 
+        DTRAN_NAME, nstates, MAX_CHARS);
+      print_array(Ofile, (int *)dtran, nstates, MAX_CHARS);
+      defnext(Ofile, DTRAN_NAME);
+    } else if (Column_compress) {
+      i = squash(Ofile, dtran, nstates, MAX_CHARS, DTRAN_NAME);
+      cnext(Ofile, DTRAN_NAME);
+      if (Verbose) {
+        printf("%d bytes required for column-compressed tables\n\n",
+		      i /* dtran      */
+		      + (nstates * sizeof(int))); /* Yyaccept  */
+      }
+    }
+
+    pdriver(Ofile, nstates, accept); /* print rest of driver and */
+    tail();                          /* everything following the second %% */
+  }
+
+}
