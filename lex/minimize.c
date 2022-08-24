@@ -174,6 +174,7 @@ int min_dfa(char *(*input_function)(void), ROW **dfap, ACCEPT **acceptp)
   return Numgroups;
 }
 
+#ifndef MAIN
 char *getstr()
 {
   static char bufs[80];
@@ -196,3 +197,4 @@ int main(int argc, char *argv[])
   nstates = min_dfa(getstr, &dtran, &accept );
   printf("nstates: %d\n", nstates);
 }
+#endif

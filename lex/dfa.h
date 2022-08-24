@@ -26,10 +26,10 @@ int dfa( char *(*input_function)(void), ROW **dfap,  ACCEPT**	acceptp);         
 void pheader(FILE *fp, ROW dtran[], int nrows, ACCEPT *accept); /* print.c */
 void pdriver(FILE *output, int nrows, ACCEPT *accept);          /* print.c */
 
-void lerror(int status, char *fmt, ...);       /* lex.c */
-int main(int argc, char *argv[]);             /* lex.c */
+void lerror(int status, char *fmt, ...);        /* lex.c */
+int main(int argc, char *argv[]);               /* lex.c */
 
-char *get_expr();          /* input.c */
+char *get_expr();                               /*lex.c */
 
 int squash(FILE *fp, ROW *dtran, int nrows, int ncols, char *name);  /* squash.c */
 void cnext(FILE *fp, char *name);                                    /* squash.c */

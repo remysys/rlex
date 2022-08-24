@@ -63,7 +63,7 @@ int input(void) /* this is a macro in unix lex */
 }
 
 
-yylex() {
+int yylex() {
   int yymoreflg;              /* set by yymore() */
   static int yystate = -1;    /* current state */
   int yylastaccept;           /* most recently seen accept state */

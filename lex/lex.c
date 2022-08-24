@@ -17,7 +17,94 @@ static int No_compression  = 0;
 static int No_header       = 0;
 static int Header_only     = 0;
 
-#define VERSION "1.01 [gcc 4.8.5]"
+#define VERSION "0.01 [gcc 4.8.5]"
+
+static int getrule(char **stringp, int n, FILE *stream)
+{
+  /* gets a line of input. gets at most n-1 characters. updates *stringp
+   * to point at the '\0' at the end of the string. return a lookahead
+   * character (the character that follows the \n in the input). the '\n'
+   * is not put into the string.
+   *
+   * return the character following the \n normally,
+   *   EOF  at end of file,
+   *	 0 if the line is too long.
+   */
+  
+  static int lookahead = 0;
+  char *str = *stringp;
+
+  if (lookahead == 0) {
+    lookahead = getc(stream);
+  }
+
+  if (n > 0 && lookahead != EOF) {
+    while(--n > 0) {
+      *str = lookahead;
+      lookahead = getc(stream);
+      if (*str == '\n' || *str == EOF) {
+        break;
+      }
+      str++;
+    }
+    *str = '\0';
+    *stringp = str;
+  }
+
+  return (n <= 0) ? 0 : lookahead;
+}
+
+char *get_expr()
+{
+  /* input routine for nfa(). gets a regular expression and the associated
+   * string from the input stream. returns a pointer to the input string
+   * normally. returns NULL on end of file or if a line beginning with % is
+   * encountered. all blank lines are discarded and all lines that start with
+   * whitespace are concatenated to the previous line. the global variable
+   * Lineno is set to the line number of the top line of a multiple-line
+   * block. Actual_lineno holds the real line number.
+   */
+
+  static int lookahead = 0;
+  int space_left = MAXINP;
+  char *p = Input_buf;
+
+  if (Verbose > 1) {
+    printf("b%d: ", Actual_lineno);
+  }
+  
+  if (lookahead == '%') {
+    return NULL; /* next line starts with a % sign, return End-of-input marker */
+  }
+
+  Lineno = Actual_lineno;
+
+  while((lookahead = getrule(&p, space_left, Ifile)) != EOF) {
+    if (lookahead) {
+      lerror(1, "rule too long\n");
+    }
+
+    
+    Actual_lineno++;
+    if (!Input_buf[0]) {
+      continue; /* ignore blank lines */
+    }
+
+    space_left = MAXINP - (p - Input_buf);
+
+    if (!isspace(lookahead)) {
+      break;
+    }
+    *p++ = '\n';
+    space_left = space_left - 1;
+  }
+
+  if (Verbose > 1) {
+    printf("%s\n", lookahead == EOF ? Input_buf : "--EOF--");
+  }
+
+  return lookahead == EOF ? Input_buf : NULL;
+}
 
 void signon()
 {
@@ -307,5 +394,4 @@ void do_file()
     pdriver(Ofile, nstates, accept); /* print rest of driver and */
     tail();                          /* everything following the second %% */
   }
-
 }
