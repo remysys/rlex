@@ -13,16 +13,16 @@ int Num_states; /* number of states in NFA */
 int nfa(char* (*input_function) (void)) 
 {
   /* compile the NFA and initialize the various global variables used by
-     * move() and e_closure(). return the state number (index) of the NFA start
-     * state. This routine must be called before either e_closure() or move()
-     * are called. The memory used for the nfa can be freed with free_nfa()
-     * (in thompson.c).
-     */
+   * move() and e_closure(). return the state number (index) of the NFA start
+   * state. This routine must be called before either e_closure() or move()
+   * are called. The memory used for the nfa can be freed with free_nfa()
+   * (in thompson.c).
+   */
 
-     NFA *sstate;
-     Nfa = thompson(input_function, &Num_states, &sstate);
+  NFA *sstate;
+  Nfa = thompson(input_function, &Num_states, &sstate);
 
-     return (sstate - Nfa);
+  return (sstate - Nfa);
 }
 
 void free_nfa()
@@ -33,67 +33,67 @@ void free_nfa()
 SET *e_closure(SET *input, char **accept, int *anchor)
 {
   /* input is the set of start states to examine.
-     * *accept  is modified to point at the string associated with an accepting
-     *	        state (or to NULL if the state isn't an accepting state).
-     * *anchor  is modified to hold the anchor point, if any.
-     *
-     * computes the epsilon closure set for the input states. The output set
-     * will contain all states that can be reached by making epsilon transitions
-     * from all NFA states in the input set. returns an empty set if the input
-     * set or the closure set is empty, modifies *accept to point at the
-     * accepting string if one of the elements of the output state is an
-     * accepting state.
-     */
+   * *accept  is modified to point at the string associated with an accepting
+   *	        state (or to NULL if the state isn't an accepting state).
+   * *anchor  is modified to hold the anchor point, if any.
+   *
+   * computes the epsilon closure set for the input states. The output set
+   * will contain all states that can be reached by making epsilon transitions
+   * from all NFA states in the input set. returns an empty set if the input
+   * set or the closure set is empty, modifies *accept to point at the
+   * accepting string if one of the elements of the output state is an
+   * accepting state.
+   */
 
-    int stack[NFA_MAX]; 
-    int *sp;
-    int i;
-    int accept_num;
-    NFA *p;
-    
-    if (!input) {
-      goto abort;
+  int stack[NFA_MAX]; 
+  int *sp;
+  int i;
+  int accept_num;
+  NFA *p;
+  
+  if (!input) {
+    goto abort;
+  }
+
+  *accept = NULL;
+  *anchor = 0;
+  accept_num = MAX_INT;
+
+  sp = &stack[-1];
+  for(next_member(NULL); (i = next_member(input)) >= 0; ) {
+    *++sp = i;
+  }
+
+  while(INBOUNDS(stack, sp)) {
+    i = *sp--;
+    p = &Nfa[i];
+    if (p->accept && i < accept_num) {
+      accept_num = i;
+      *accept = p->accept;
+      *anchor = p->anchor;
     }
 
-    *accept = NULL;
-    *anchor = 0;
-    accept_num = MAX_INT;
-
-    sp = &stack[-1];
-    for(next_member(NULL); (i = next_member(input)) >= 0; ) {
-      *++sp = i;
-    }
-
-    while(INBOUNDS(stack, sp)) {
-      i = *sp--;
-      p = &Nfa[i];
-      if (p->accept && i < accept_num) {
-        accept_num = i;
-        *accept = p->accept;
-        *anchor = p->anchor;
-      }
-
-      if (p->edge == EPSILON) {
-        if (p->next) {
-          i = p->next - Nfa;
-          if (!MEMBER(input, i)) {
-            ADD(input, i);
-            *++sp = i;
-          }
-        }
-
-        if (p->next2) {
-          i = p->next2 - Nfa;
-          if (!MEMBER(input, i)) {
-            ADD(input, i);
-            *++sp = i;
-          }
+    if (p->edge == EPSILON) {
+      if (p->next) {
+        i = p->next - Nfa;
+        if (!MEMBER(input, i)) {
+          ADD(input, i);
+          *++sp = i;
         }
       }
+
+      if (p->next2) {
+        i = p->next2 - Nfa;
+        if (!MEMBER(input, i)) {
+          ADD(input, i);
+          *++sp = i;
+        }
+      }
     }
+  }
 
 abort:
-    return input;
+  return input;
 }
 
 SET *move(SET *inp_set, int c)
@@ -113,8 +113,8 @@ SET *move(SET *inp_set, int c)
       if (p->edge == c || (p->edge == CCL && TEST(p->bitset, c))) {
         if (!outset) {
           outset = newset();
-          ADD(outset, p->next - Nfa);
         }
+        ADD(outset, p->next - Nfa);
       }
     }
   }
