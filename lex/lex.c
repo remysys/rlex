@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "set.h"
 #include "dfa.h"
 #include "globals.h"
 #include "nfa.h"
@@ -284,7 +285,7 @@ void tail()
 }
 
 
-void defnext(FILE *fp, name)
+void defnext(FILE *fp, char *name)
 {
   /* print the default yy_next(s,c) subroutine for an uncompressed table */
   static char *comment_text[] = 
@@ -294,8 +295,59 @@ void defnext(FILE *fp, name)
     NULL
   };
 
-  comment_text(fp, comment_text);
+  comment(fp, comment_text);
   fprintf(fp, "#define yy_next(state, c)  (%s[state][c])\n", name);
+}
+
+void do_file()
+{
+  int nstates;    /* number of DFA states */
+  ROW *dtran;     /* transition table */
+  ACCEPT *accept; /* set of accept states in dfa */
+  int i;
+
+  /* process the input file */
+
+  head(Header_only);  /* print everything up to first %% */
+
+  nstates = min_dfa(get_expr, &dtran, &accept); /* make dfa */
+  
+  if (Verbose) {
+    printf("%d out of %d DFA states in minimized machine\n", nstates, DFA_MAX);
+	  printf("%d bytes required for minimized tables\n\n",
+		  nstates * MAX_CHARS * sizeof(TTYPE)		/* dtran  */
+	       + nstates * sizeof(TTYPE));		    /* accept */
+  }
+
+  if (!No_header) {
+    pheader(Ofile, dtran, nstates, accept);  /* print header comment*/
+  }
+
+  if (!Header_only) {
+    /* first part of driver */
+    if (!driver_1(Ofile, !No_lines)) {
+      perror("lex.par");
+      exit(1);
+    }
+
+    if (!No_compression) {
+      fprintf(Ofile, "YYPRIVATE YY_TTYPE %s[%d][%d] = \n", 
+        DTRAN_NAME, nstates, MAX_CHARS);
+      print_array(Ofile, (int *)dtran, nstates, MAX_CHARS);
+      defnext(Ofile, DTRAN_NAME);
+    } else if (Column_compress) {
+      i = squash(Ofile, dtran, nstates, MAX_CHARS, DTRAN_NAME);
+      cnext(Ofile, DTRAN_NAME);
+      if (Verbose) {
+        printf("%d bytes required for column-compressed tables\n\n",
+		      i /* dtran      */
+		      + (nstates * sizeof(int))); /* Yyaccept  */
+      }
+    }
+
+    pdriver(Ofile, nstates, accept); /* print rest of driver and */
+    tail();                          /* everything following the second %% */
+  }
 }
 
 int main(int argc, char *argv[])
@@ -343,55 +395,4 @@ int main(int argc, char *argv[])
   fclose(Ofile);
   fclose(Ifile);
   exit(0);
-}
-
-void do_file()
-{
-  int nstates;    /* number of DFA states */
-  ROW *dtran;     /* transition table */
-  ACCEPT *accept; /* set of accept states in dfa */
-  int i;
-
-  /* process the input file */
-
-  head(Header_only);  /* print everything up to first %% */
-
-  nstates = min_dfa(get_expr, &dtran, &accept); /* make dfa */
-  
-  if (Verbose) {
-    printf("%d out of %d DFA states in minimized machine\n", nstates, DFA_MAX);
-	  printf("%d bytes required for minimized tables\n\n",
-		  nstates * MAX_CHARS * sizeof(TTYPE)		/* dtran  */
-	       + nstates * sizeof(TTYPE));		    /* accept */
-  }
-
-  if (!No_header) {
-    pheader(Ofile, dtran, nstates, accept) /* print header comment*/
-  }
-
-  if (!Header_only) {
-    /* first part of driver */
-    if (!driver_1(Ofile, !No_lines)) {
-      perror("lex.par");
-      exit(1);
-    }
-
-    if (!No_compression) {
-      fprintf(Ofile, "YYPRIVATE YY_TTYPE %s[%d][%d] = \n", 
-        DTRAN_NAME, nstates, MAX_CHARS);
-      print_array(Ofile, (int *)dtran, nstates, MAX_CHARS);
-      defnext(Ofile, DTRAN_NAME);
-    } else if (Column_compress) {
-      i = squash(Ofile, dtran, nstates, MAX_CHARS, DTRAN_NAME);
-      cnext(Ofile, DTRAN_NAME);
-      if (Verbose) {
-        printf("%d bytes required for column-compressed tables\n\n",
-		      i /* dtran      */
-		      + (nstates * sizeof(int))); /* Yyaccept  */
-      }
-    }
-
-    pdriver(Ofile, nstates, accept); /* print rest of driver and */
-    tail();                          /* everything following the second %% */
-  }
 }

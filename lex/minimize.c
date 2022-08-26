@@ -174,7 +174,7 @@ int min_dfa(char *(*input_function)(void), ROW **dfap, ACCEPT **acceptp)
   return Numgroups;
 }
 
-#ifndef MAIN
+#ifdef MAIN
 char *getstr()
 {
   static char bufs[80];

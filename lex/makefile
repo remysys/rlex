@@ -41,8 +41,9 @@ nfa: nfa.o set.o hash.o printnfa.o esc.o
 dfa: dfa.o nfa.o set.o hash.o printnfa.o esc.o squash.o tools.o minimize.o egrep.o print.o
 	gcc -o $@ $^
 
-egrep: egrep.o nfa.o set.o hash.o printnfa.o esc.o
+egrep: egrep.o nfa.o set.o hash.o printnfa.o escape.o
 	gcc -o $@ $^
+
 
 clean:
 	rm -fr *.o
@@ -51,3 +52,9 @@ clean:
 	rm -fr set
 	rm -fr egrep
 	rm -fr dfa
+
+OBJS	= lex.o squash.o minimize.o dfa.o nfa.o escape.o\
+	  print.o printnfa.o egrep.o set.o hash.o print.o tools.o driver.o
+
+rlex:  $(OBJS)
+	gcc -o rlex $(OBJS)

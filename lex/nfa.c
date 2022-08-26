@@ -8,7 +8,7 @@
 #include "nfa.h"
 #include "comm.h"
 #include "globals.h"
-#include "esc.h"
+#include "escape.h"
 
 /* make an nfa from a lex input file using thompson's construction */
 
@@ -95,72 +95,72 @@ void dodash(SET *set);
 
 NFA *new() 
 {
-    NFA *p;
-    static int first_time = 1;
-    if (first_time) {
-        if (!(Nfa_states = (NFA *)calloc(NFA_MAX, sizeof(NFA)))) {
-            parse_err(E_MEM);
-        }
-        first_time = 0;
-        Sp = &Sstack[-1];
+  NFA *p;
+  static int first_time = 1;
+  if (first_time) {
+    if (!(Nfa_states = (NFA *)calloc(NFA_MAX, sizeof(NFA)))) {
+        parse_err(E_MEM);
     }
-    if (++Nstates >= NFA_MAX) {
-        parse_err(E_LENGTH);
-    }
-    
-    p = !STACK_OK() ? &Nfa_states[Next_alloc++] : POP();
-    p->edge = EPSILON;
-    return p;
+    first_time = 0;
+    Sp = &Sstack[-1];
+  }
+  if (++Nstates >= NFA_MAX) {
+    parse_err(E_LENGTH);
+  }
+  
+  p = !STACK_OK() ? &Nfa_states[Next_alloc++] : POP();
+  p->edge = EPSILON;
+  return p;
 }
 
 void discard (NFA *nfa)
 {
-    --Nstates;
-    memset(nfa, 0, sizeof(NFA));
-    nfa->edge = EMPTY;
-    PUSH(nfa);
-    if (!STACK_OK()) {
-        parse_err(E_STACK);
-    }
+  --Nstates;
+  memset(nfa, 0, sizeof(NFA));
+  nfa->edge = EMPTY;
+  PUSH(nfa);
+  if (!STACK_OK()) {
+      parse_err(E_STACK);
+  }
 }
 
 char *save(char *str) 
 {
-    static int first_time = 1;
-    static int *strings; /* place to save accepting strings */
-    static int *savep;   /* current position in strings array*/
-    static char size[8]; /* query-mode size */
-    
-    if (first_time) {
-        if (!(savep = strings = (int *)malloc(STR_MAX))) {
-            parse_err(E_MEM);
-        }
-        first_time = 0;
+  static int first_time = 1;
+  static int *strings; /* place to save accepting strings */
+  static int *savep;   /* current position in strings array*/
+  static char size[8]; /* query-mode size */
+  
+  if (first_time) {
+    if (!(savep = strings = (int *)malloc(STR_MAX))) {
+        parse_err(E_MEM);
     }
+    first_time = 0;
+  }
 
-    if (!str) { /* query mode, return number of bytes in use */
-        sprintf(size, "%ld", (long)(savep - strings));
-        return size;
+  if (!str) { /* query mode, return number of bytes in use */
+    sprintf(size, "%ld", (long)(savep - strings));
+    return size;
+  }
+
+  if (*str == '|') {
+    return (char *) (savep + 1);
+  }
+
+  *savep++ = Lineno;
+
+  char *textp;
+  for (textp = (char *)savep; *str; *textp++ = *str++) {
+    if (textp >= (char *)strings + (STR_MAX - 1)) {
+        parse_err(E_STRINGS);
     }
+  }
 
-    if (*str == '|') {
-        return (char *) (savep + 1);
-    }
-
-    *savep++ = Lineno;
-
-    char *textp;
-    for (textp = (char *)savep; *str; *textp++ = *str++) {
-        if (textp >= (char *)strings + (STR_MAX - 1)) {
-            parse_err(E_STRINGS);
-        }
-    }
-
-    *textp++ = '\0';
-    char *startp = (char *)savep;
-    int len = textp - startp;
-    savep += (len / sizeof(int)) + (len % sizeof(int) != 0);
-    return startp;
+  *textp++ = '\0';
+  char *startp = (char *)savep;
+  int len = textp - startp;
+  savep += (len / sizeof(int)) + (len % sizeof(int) != 0);
+  return startp;
 }
 
 
@@ -239,125 +239,125 @@ int Lexeme;                  /* value associated with LITERAL */
 
 void errmsg(int type, char *table[], char *msgtype) 
 {
-    char *p;
-    fprintf(stderr, "%s (line %d) %s\n", msgtype, Actual_lineno, table[type]);
-    
-    for (p = S_input; ++p <= Input; putc('-', stderr))
-        ;
-    fprintf(stderr, "v\n%s\n", S_input);
-    exit(1);
+  char *p;
+  fprintf(stderr, "%s (line %d) %s\n", msgtype, Actual_lineno, table[type]);
+  
+  for (p = S_input; ++p <= Input; putc('-', stderr))
+      ;
+  fprintf(stderr, "v\n%s\n", S_input);
+  exit(1);
 }
 
 void warning(WARN_NUM type) 
 {
-    errmsg((int)type, Warnmsgs, "WARNING");
+  errmsg((int)type, Warnmsgs, "WARNING");
 }   
 
 void parse_err(ERR_NUM type) 
 {
-    errmsg((int)type, Errmsgs, "ERROR");
+  errmsg((int)type, Errmsgs, "ERROR");
 }
 
 void new_macro(char *def) 
 {
-     /* add a new macro to the table. ff two macros have the same name, the
-     * second one takes precedence. a definition takes the form:
-     * name <whitespace> text [<whitespace>]
-     * whitespace at the end of the line is ignored.
-     */
-    
-    char *name;  /* name of macro definition */
-    char *text;  /* text of macro definition */
-    
-    static int first_time = 1;
-    
-    if (first_time) {
-        Macros = maketab(31, hash_add, strcmp);
-        first_time = 0;
-    }
+  /* add a new macro to the table. ff two macros have the same name, the
+   * second one takes precedence. a definition takes the form:
+   * name <whitespace> text [<whitespace>]
+   * whitespace at the end of the line is ignored.
+   */
+  
+  char *name;  /* name of macro definition */
+  char *text;  /* text of macro definition */
+  
+  static int first_time = 1;
+  
+  if (first_time) {
+    Macros = maketab(31, hash_add, strcmp);
+    first_time = 0;
+  }
 
-    for (name = def; *def && !isspace(*def); def++)
+  for (name = def; *def && !isspace(*def); def++)
+      ;
+  
+  if (*def) {
+    *def++ = '\0';
+  }
+
+  while(isspace(*def)) { /* skip up to macro body */
+    def++;
+  }
+  
+  if (!*def) {
+    parse_err(E_BADMAC);
+  }
+
+  text = def;
+
+
+  /* strip trailing white space */
+  char *edef = NULL;
+
+  while (*def) {
+    if (!isspace(*def)) {
+      def++;
+    } else {
+      for (edef = def; isspace(*def); ++def)
         ;
-    
-    if (*def) {
-        *def++ = '\0';
     }
+  }
 
-    while(isspace(*def)) { /* skip up to macro body */
-        def++;
-    }
-    
-    if (!*def) {
-        parse_err(E_BADMAC);
-    }
+  if (edef) {
+    *edef = '\0';
+  }
 
-    text = def;
+  /* add the macro to the symbol table */
 
-
-    /* strip trailing white space */
-    char *edef = NULL;
-
-    while (*def) {
-        if (!isspace(*def)) {
-            def++;
-        } else {
-            for (edef = def; isspace(*def); ++def)
-                ;
-        }
-    }
-
-    if (edef) {
-        *edef = '\0';
-    }
-
-    /* add the macro to the symbol table */
-
-    MACRO *p = (MACRO *) newsym(sizeof(MACRO));
-    
-    strncpy(p->name, name, MACRO_NAME_MAX);
-    strncpy(p->text, text, MACRO_TEXT_MAX);
-    addsym(Macros, p);
+  MACRO *p = (MACRO *) newsym(sizeof(MACRO));
+  
+  strncpy(p->name, name, MACRO_NAME_MAX);
+  strncpy(p->text, text, MACRO_TEXT_MAX);
+  addsym(Macros, p);
 }
 
 char *get_macro(char **namep) 
 {
-    /* return a pointer to the contents of a macro having the indicated
-     * name. abort with a message if no macro exists. the macro name includes
-     * the brackets. *namep is modified to point past the close brace.
-     */
+  /* return a pointer to the contents of a macro having the indicated
+  * name. abort with a message if no macro exists. the macro name includes
+  * the brackets. *namep is modified to point past the close brace.
+  */
 
-    char *p;
-    MACRO *macrop;
+  char *p;
+  MACRO *macrop;
 
-    if (!(p = strchr(++(*namep), '}'))) {
-        parse_err(E_BADMAC);
-    }
+  if (!(p = strchr(++(*namep), '}'))) {
+    parse_err(E_BADMAC);
+  }
 
-    *p = '\0';
-    if (!(macrop = (MACRO *) findsym(Macros, *namep))) {
-        parse_err(E_NOMAC);
-    }
+  *p = '\0';
+  if (!(macrop = (MACRO *) findsym(Macros, *namep))) {
+    parse_err(E_NOMAC);
+  }
 
-    *p++ = '}';
-    
-    *namep = p; /* *namep is modified to point past the close brace */
-    
-    return macrop->text;
+  *p++ = '}';
+  
+  *namep = p; /* *namep is modified to point past the close brace */
+  
+  return macrop->text;
 }
 
 void print_a_macro(MACRO *macrop) 
 {
-    printf( "%-16s--[%s]--\n", macrop->name, macrop->text);
+  printf( "%-16s--[%s]--\n", macrop->name, macrop->text);
 }
 
 void printmacs() /* print all the macros to stdout */
 {
-    if (!Macros) {
-        printf("\tthere are no macros\n");
-    } else {
-        printf("\nMACROS:\n");
-        ptab(Macros, (void (*)(void *, ...))print_a_macro, NULL, 1);
-    }
+  if (!Macros) {
+    printf("\tthere are no macros\n");
+  } else {
+    printf("\nMACROS:\n");
+    ptab(Macros, (void (*)(void *, ...))print_a_macro, NULL, 1);
+  }
 }
 
 
@@ -393,74 +393,73 @@ void printmacs() /* print all the macros to stdout */
     } 
 
     if (Current_tok == EOS) {
-        if (inquote) {
-            parse_err(E_NEWLINE); 
+      if (inquote) {
+          parse_err(E_NEWLINE); 
+      }
+      do {
+      /* sit in this loop until a non-blank line is read into	the "Input" array */
+
+        if (!(Input = input_func())) { /* then at end of file  */
+            Current_tok = END_OF_INPUT;
+            goto exit;
         }
-        do {
-            /* sit in this loop until a non-blank line is read into	the "Input" array */
 
-            if (!(Input = input_func())) { /* then at end of file  */
-                Current_tok = END_OF_INPUT;
-                goto exit;
-            }
+        while (isspace(*Input)) { /* ignore leading white space */
+            Input++;
+        }
+      } while (!*Input);  /* ignore blank lines */
 
-            while (isspace(*Input)) { /* ignore leading white space */
-                Input++;
-            }
-        } while (!*Input);  /* ignore blank lines */
-
-        S_input = Input;    /* remember start of line */
+      S_input = Input;    /* remember start of line */
     }
 
     while (*Input == '\0') {
-        if (INBOUNDS(stack, sp)) { /* restore previous input source */
-            Input = *sp--;
-            continue;
-        }
+      if (INBOUNDS(stack, sp)) { /* restore previous input source */
+          Input = *sp--;
+          continue;
+      }
 
-        Current_tok = EOS;  /* no more input sources to restore and at the real end of string*/
-        Lexeme = '\0';
-        goto exit;
+      Current_tok = EOS;  /* no more input sources to restore and at the real end of string*/
+      Lexeme = '\0';
+      goto exit;
     }
 
     if (!inquote) {
-        while(*Input == '{') {
-            *++sp = Input;          /* stack current input string */
-            Input = get_macro(sp);  /* use macro body as input string, *sp is modified past the close brace */
-            
-            if (TOOHIGH(stack, sp)) {
-                parse_err(E_MACDEPTH);
-            }
+      while(*Input == '{') {
+        *++sp = Input;          /* stack current input string */
+        Input = get_macro(sp);  /* use macro body as input string, *sp is modified past the close brace */
+        
+        if (TOOHIGH(stack, sp)) {
+          parse_err(E_MACDEPTH);
         }
+      }
     }
 
     if (*Input == '"') {
-        inquote = ~inquote;
-        if (!*++Input) {
-            Current_tok = EOS;
-            Lexeme = '\0';
-            goto exit;
-        }
+      inquote = ~inquote;
+      if (!*++Input) {
+        Current_tok = EOS;
+        Lexeme = '\0';
+        goto exit;
+      }
     }
 
     saw_esc = (*Input == '\\');
 
     if (!inquote) {
-        if (isspace(*Input)) {
-            Current_tok = EOS;
-            Lexeme = '\0';
-            goto exit;
-        }
-        Lexeme = esc(&Input);
+      if (isspace(*Input)) {
+        Current_tok = EOS;
+        Lexeme = '\0';
+        goto exit;
+      }
+      Lexeme = esc(&Input);
     } else {
-        if (saw_esc && Input[1] == '"') {
-            Input += 2;
-            Lexeme = '"';
-        } else {
-            Lexeme = *Input++;
-        }
+      if (saw_esc && Input[1] == '"') {
+        Input += 2;
+        Lexeme = '"';
+      } else {
+        Lexeme = *Input++;
+      }
     }
-
 
     Current_tok = (inquote || saw_esc) ? L : Tokmap[Lexeme];
 
@@ -481,319 +480,318 @@ exit:
 
 NFA *machine() 
 {
-    NFA *start, *p;
+  NFA *start, *p;
 
-    p = start = new();
+  p = start = new();
+  p->next = rule();
+
+  while (!MATCH(END_OF_INPUT)) {
+    p->next2 = new();
+    p = p->next2;
     p->next = rule();
+  }
 
-    while (!MATCH(END_OF_INPUT)) {
-        p->next2 = new();
-        p = p->next2;
-        p->next = rule();
-    }
-
-    return start;
+  return start;
 }
 
 NFA *rule() 
 {
-    /*	rule	--> expr  EOS action
-     *		    ^expr EOS action
-     *		    expr$ EOS action
-     *
-     *	action	--> <tabs> <string of characters>
-     *		    epsilon
-     *  action  --> white_space string
-     *          white_space
-     *          epsilon    
-     */
+  /*	rule	--> expr  EOS action
+   *		    ^expr EOS action
+   *		    expr$ EOS action
+   *
+   *	action	--> <tabs> <string of characters>
+   *		    epsilon
+   *  action  --> white_space string
+   *          white_space
+   *          epsilon    
+   */
 
-    NFA *start = NULL;
-    NFA *end = NULL;
-    int anchor = NONE;
+  NFA *start = NULL;
+  NFA *end = NULL;
+  int anchor = NONE;
     
-    if (MATCH(AT_BOL)) {
-        start = new();
-        start->edge = '\n';
-        anchor |= START;
-        advance();
-        expr(&start->next, &end);
-    } else {
-        expr(&start, &end);
-    }
+  if (MATCH(AT_BOL)) {
+    start = new();
+    start->edge = '\n';
+    anchor |= START;
+    advance();
+    expr(&start->next, &end);
+  } else {
+    expr(&start, &end);
+  }
 
-    if (MATCH(AT_EOL)) {
-        advance();
-        end->next = new();
-        end->edge = '\n';
-        end = end->next;
-        anchor |= END;
-    }
+  if (MATCH(AT_EOL)) {
+    advance();
+    end->next = new();
+    end->edge = '\n';
+    end = end->next;
+    anchor |= END;
+  }
 
-    while (isspace(*Input)) {
-        Input++;
-    }
+  while (isspace(*Input)) {
+    Input++;
+  }
 
-    end->accept = save(Input);
-    end->anchor = anchor;
-    advance(); /* skip past EOS */
+  end->accept = save(Input);
+  end->anchor = anchor;
+  advance(); /* skip past EOS */
 
-    return start;
+  return start;
 }
 
 void expr (NFA **startp, NFA **endp) 
 {
-    /* because a recursive descent compiler can't handle left recursion,
-     * the productions:
-     *
-     *	expr	-> expr OR cat_expr
-     *		|  cat_expr
-     *
-     * must be translated into:
-     *
-     *	expr	-> cat_expr expr'
-     *	expr'	-> OR cat_expr expr'
-     *		   epsilon
-     *
-     * which can be implemented with this loop:
-     *
-     *	cat_expr
-     *	while( match(OR) )
-     *		cat_expr
-     *		do the OR
-     */
+  /* because a recursive descent compiler can't handle left recursion,
+   * the productions:
+   *
+   *	expr	-> expr OR cat_expr
+   *		|  cat_expr
+   *
+   * must be translated into:
+   *
+   *	expr	-> cat_expr expr'
+   *	expr'	-> OR cat_expr expr'
+   *		   epsilon
+   *
+   * which can be implemented with this loop:
+   *
+   *	cat_expr
+   *	while( match(OR) )
+   *		cat_expr
+   *		do the OR
+   */
 
-     NFA *e2_start;
-     NFA *e2_end;
-     NFA *p;
+    NFA *e2_start;
+    NFA *e2_end;
+    NFA *p;
 
-     cat_expr(startp, endp);
-     while (MATCH(OR)) {
-        advance();
-        cat_expr(&e2_start, &e2_end);
-        p = new();
-        p->next = *startp;
-        p->next2 = e2_start;
-        *startp = p;
+    cat_expr(startp, endp);
+    while (MATCH(OR)) {
+      advance();
+      cat_expr(&e2_start, &e2_end);
+      p = new();
+      p->next = *startp;
+      p->next2 = e2_start;
+      *startp = p;
 
-        p = new();
-        (*endp)->next = p;
-        e2_end->next = p;
-        *endp = p;
-     }
+      p = new();
+      (*endp)->next = p;
+      e2_end->next = p;
+      *endp = p;
+    }
 }
 
 
 void cat_expr(NFA **startp, NFA **endp)
 {
-    /* the same translations that were needed in the expr rules are needed again
-     * here:
-     *
-     *	cat_expr  -> cat_expr factor
-     *		     factor
-     *
-     * is translated to:
-     *
-     *	cat_expr  -> factor cat_expr'
-     *	cat_expr' -> | factor cat_expr'
-     *		     epsilon
-     */
+  /* the same translations that were needed in the expr rules are needed again
+   * here:
+   *
+   *	cat_expr  -> cat_expr factor
+   *		     factor
+   *
+   * is translated to:
+   *
+   *	cat_expr  -> factor cat_expr'
+   *	cat_expr' -> | factor cat_expr'
+   *		     epsilon
+   */
 
-    NFA *e2_start;
-    NFA *e2_end;
+  NFA *e2_start;
+  NFA *e2_end;
 
-     if (first_in_cat(Current_tok)) {
-        factor(startp, endp);
-     }
+  if (first_in_cat(Current_tok)) {
+    factor(startp, endp);
+  }
 
-     while (first_in_cat(Current_tok)) {
-        factor(&e2_start, &e2_end);
-        memcpy(*endp, e2_start, sizeof(NFA));
-        discard(e2_start);
-        *endp = e2_end;
-     }
+  while (first_in_cat(Current_tok)) {
+    factor(&e2_start, &e2_end);
+    memcpy(*endp, e2_start, sizeof(NFA));
+    discard(e2_start);
+    *endp = e2_end;
+  }
 }
 
 int first_in_cat(TOKEN tok) {
-    switch (tok) {
-        case CLOSE_PAREN:
-        case AT_EOL: 
-        case OR:
-        case EOS: return 0;  
-    }
+  switch (tok) {
+    case CLOSE_PAREN:
+    case AT_EOL: 
+    case OR:
+    case EOS: return 0;  
+  }
 
-    return 1;
+  return 1;
 }
 
 void factor (NFA **startp , NFA **endp) {
 
-    /*  factor	--> term*  | term+  | term? | term */
-    NFA *start;
-    NFA *end;
-    term(startp, endp);
-    if (MATCH(CLOSURE) || MATCH(PLUS_CLOSE) || MATCH(OPTIONAL)) {
-        
-        start = new();
-        end = new();
-        start->next = *startp;
-        (*endp)->next = end;
-        
-        if (MATCH(CLOSURE) || MATCH(OPTIONAL)) {
-            start->next2 = end;
-        }
-
-        if (MATCH(CLOSURE) || MATCH(PLUS_CLOSE)) {
-            (*endp)->next2 = *startp;
-        }
-
-        *startp = start;
-        *endp = end;
-        advance();
+  /*  factor	--> term*  | term+  | term? | term */
+  NFA *start;
+  NFA *end;
+  term(startp, endp);
+  if (MATCH(CLOSURE) || MATCH(PLUS_CLOSE) || MATCH(OPTIONAL)) {
+      
+    start = new();
+    end = new();
+    start->next = *startp;
+    (*endp)->next = end;
+      
+    if (MATCH(CLOSURE) || MATCH(OPTIONAL)) {
+      start->next2 = end;
     }
+
+    if (MATCH(CLOSURE) || MATCH(PLUS_CLOSE)) {
+      (*endp)->next2 = *startp;
+    }
+
+    *startp = start;
+    *endp = end;
+    advance();
+  }
 }
 
 void term(NFA **startp, NFA **endp) {
-   /* process the term productions:
-     *
-     * term  --> [string]  |  [^string]  |  []  |  [^] |  .  | (expr) | <character>
-     *
-     * the [] is nonstandard. It matches a space, tab, formfeed, or newline,
-     * but not a carriage return (\r). All of these are single nodes in the
-     * NFA.
-     */ 
-    NFA *start;
-    int c;
+  /* process the term productions:
+   *
+   * term  --> [string]  |  [^string]  |  []  |  [^] |  .  | (expr) | <character>
+   *
+   * the [] is nonstandard. It matches a space, tab, formfeed, or newline,
+   * but not a carriage return (\r). All of these are single nodes in the
+   * NFA.
+   */ 
+  NFA *start;
+  int c;
 
-    if (MATCH(OPEN_PAREN)) {
-        advance();
-        expr(startp, endp);
-        if (MATCH(CLOSE_PAREN)) {
-            advance();
-        } else {
-            parse_err(E_PAREN);
-        }
+  if (MATCH(OPEN_PAREN)) {
+    advance();
+    expr(startp, endp);
+    if (MATCH(CLOSE_PAREN)) {
+      advance();
     } else {
-        *startp = start = new();
-        *endp = start->next = new();
-
-        if (!(MATCH(ANY) || MATCH(CCL_START))) {
-            start->edge = Lexeme;
-            advance();
-        } else {
-            start->edge = CCL;
-            if (!(start->bitset = newset())) {
-                parse_err(E_MEM);
-            }
-
-            if (MATCH(ANY)) {
-                ADD(start->bitset, '\n');
-                COMPLEMENT(start->bitset);
-            } else {
-                advance();
-                if (MATCH(AT_BOL)) {
-                    advance();
-                    ADD(start->bitset, '\n');
-                    COMPLEMENT(start->bitset);
-                }
-
-                if (!MATCH(CCL_END)) {
-                    dodash(start->bitset);
-                } else { /* [] [^] */
-                    for (c = 0; c <= ' '; c++) {
-                        ADD(start->bitset, c);
-                    }
-                }
-            }
-            advance();
-        }
+        parse_err(E_PAREN);
     }
+  } else {
+    *startp = start = new();
+    *endp = start->next = new();
+
+    if (!(MATCH(ANY) || MATCH(CCL_START))) {
+      start->edge = Lexeme;
+      advance();
+    } else {
+      start->edge = CCL;
+      if (!(start->bitset = newset())) {
+        parse_err(E_MEM);
+      }
+
+      if (MATCH(ANY)) {
+        ADD(start->bitset, '\n');
+        COMPLEMENT(start->bitset);
+      } else {
+        advance();
+        if (MATCH(AT_BOL)) {
+          advance();
+          ADD(start->bitset, '\n');
+          COMPLEMENT(start->bitset);
+        }
+
+        if (!MATCH(CCL_END)) {
+          dodash(start->bitset);
+        } else { /* [] [^] */
+          for (c = 0; c <= ' '; c++) {
+            ADD(start->bitset, c);
+          }
+        }
+      }
+      advance();
+    }
+  }
 }
 
 void dodash(SET *set) 
 {
-    int first;
+  int first;
 
-    if (MATCH(DASH)) { /* treat [-...] as a literal dash */
-        warning(W_STARTDASH);
+  if (MATCH(DASH)) { /* treat [-...] as a literal dash */
+    warning(W_STARTDASH);
+    ADD(set, Lexeme);
+    advance();
+  }
+
+  for (; !MATCH(EOS) && !MATCH(CCL_END); advance()) {
+    if (!MATCH(DASH)) {
+      first = Lexeme;
+      ADD(set, Lexeme);
+    } else {
+      advance();
+      if (MATCH(CCL_END)) { /* treat [...-] as literal */
+        warning(W_ENDDASH);
         ADD(set, Lexeme);
-        advance();
-    }
-
-    for (; !MATCH(EOS) && !MATCH(CCL_END); advance()) {
-        if (!MATCH(DASH)) {
-            first = Lexeme;
-            ADD(set, Lexeme);
-        } else {
-            advance();
-            if (MATCH(CCL_END)) { /* treat [...-] as literal */
-                warning(W_ENDDASH);
-                ADD(set, Lexeme);
-            } else {
-                for (; first <= Lexeme; first++) {
-                    ADD(set, first);
-                }
-            }
+      } else {
+        for (; first <= Lexeme; first++) {
+            ADD(set, first);
         }
+      }
     }
+  }
 }
 	
 
 NFA *thompson(char *(*input_function)(void), int *max_state, NFA **start_state)
 {
-    /* access routine to this module. return a pointer to a NFA transition
-     * table that represents the regular expression pointed to by expr or
-     * NULL if there's not enough memory. modify *max_state to reflect the
-     * largest state number used. this number will probably be a larger
-     * number than the total number of states. Modify *start_state to point
-     * to the start state. This pointer is garbage if thompson() returned 0.
-     * The memory for the table is fetched from malloc(); use free() to
-     * discard it.
-     */
-    CLEAR_STACK();
-    input_func = input_function;
+  /* access routine to this module. return a pointer to a NFA transition
+   * table that represents the regular expression pointed to by expr or
+   * NULL if there's not enough memory. modify *max_state to reflect the
+   * largest state number used. this number will probably be a larger
+   * number than the total number of states. Modify *start_state to point
+   * to the start state. This pointer is garbage if thompson() returned 0.
+   * The memory for the table is fetched from malloc(); use free() to
+   * discard it.
+   */
+  CLEAR_STACK();
+  input_func = input_function;
 
-    Current_tok = EOS;
-    advance();
+  Current_tok = EOS;
+  advance();
 
-    Nfa_states = 0;
-    Next_alloc = 0;
+  Nfa_states = 0;
+  Next_alloc = 0;
     
-    *start_state = machine();
-    *max_state = Next_alloc;
+  *start_state = machine();
+  *max_state = Next_alloc;
 
-    if (Verbose > 1) {
-        print_nfa(Nfa_states, *max_state, *start_state);
-    }
+  if (Verbose > 1) {
+    print_nfa(Nfa_states, *max_state, *start_state);
+  }
 
-    if (Verbose) {
-	    printf("%d/%d NFA states used.\n", *max_state, NFA_MAX );
-	    printf("%s/%d bytes used for accept strings.\n\n", save(NULL), STR_MAX);
-    }
+  if (Verbose) {
+    printf("%d/%d NFA states used.\n", *max_state, NFA_MAX );
+    printf("%s/%d bytes used for accept strings.\n\n", save(NULL), STR_MAX);
+  }
 
-    return Nfa_states;
+  return Nfa_states;
 }
 
 #ifdef MAIN
 
 char *getstr()
 {
-    static char bufs[80];
-    printf("%d: ", Lineno++);
-    if (fgets(bufs, NUMELE(bufs), stdin)) {
-        return bufs;
-    } else {
-        return NULL;
-    }
+  static char bufs[80];
+  printf("%d: ", Lineno++);
+  if (fgets(bufs, NUMELE(bufs), stdin)) {
+      return bufs;
+  } else {
+      return NULL;
+  }
 }
 
 int main(int argc, char *argv[])
 {
-    NFA *nfa, *start_state;
-    int max_state;
-    Verbose = 2;
+  NFA *nfa, *start_state;
+  int max_state;
+  Verbose = 2;
 
-    nfa = thompson(getstr, &max_state, &start_state);
-    return 0;
+  nfa = thompson(getstr, &max_state, &start_state);
+  return 0;
 }
-
 #endif
