@@ -81,7 +81,7 @@ char *get_expr()
   Lineno = Actual_lineno;
 
   while((lookahead = getrule(&p, space_left, Ifile)) != EOF) {
-    if (lookahead) {
+    if (!lookahead) {
       lerror(1, "rule too long\n");
     }
 
@@ -101,10 +101,10 @@ char *get_expr()
   }
 
   if (Verbose > 1) {
-    printf("%s\n", lookahead == EOF ? Input_buf : "--EOF--");
+    printf("%s\n", lookahead ? Input_buf : "--EOF--");
   }
 
-  return lookahead == EOF ? Input_buf : NULL;
+  return lookahead ? Input_buf : NULL;
 }
 
 void signon()
@@ -141,14 +141,14 @@ void cmd_line_error(int usage, char *fmt, ...)
   if (!usage) {
     perror("");
   } else {
-    E("\n\nUsage is:     rleX [options] file");
-	  E("-f  for (f)ast. Don't compress tables");
+    E("\n\nusage is: rlex [options] file");
+	  E("-f  for (f)ast. don't compress tables");
  	  E("-h  suppress (h)eader comment that describes state machine");
 	  E("-H  print the (H)eader only");
-	  E("-l  Suppress #(l)ine directives in the output");
-	  E("-t  Send output to standard output instead of lexyy.c");
+	  E("-l  suppress #(l)ine directives in the output");
+	  E("-t  send output to standard output instead of lexyy.c");
 	  E("-v  (v)erbose mode, print statistics");
-	  E("-V  More (V)erbose, print internal diagnostics as lex runs");
+	  E("-V  more (V)erbose, print internal diagnostics as rlex runs");
   }
   
   va_end(args);

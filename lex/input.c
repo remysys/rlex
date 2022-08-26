@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include "globals.h"
 #include "input.h"
 
@@ -18,17 +22,14 @@
 
 #define NO_MORE_CHARS() (Eof_read && Next >= End_buf)
 
-typedef unsigned char uchar;
 
+char Start_buf[BUFSIZE]; /* input buffer */
+char *End_buf  = END;    
+char *Next     = END;
+char *sMark    = END;    /* start of current lexeme */
+char *eMark    = END;    /* end of current lexeme */
 
-
-uchar Start_buf[BUFSIZE]; /* input buffer */
-uchar *End_buf  = END;    
-uchar *Next     = END;
-uchar *sMark    = END;    /* start of current lexeme */
-uchar *eMark    = END;    /* end of current lexeme */
-
-uchar *pMark    = NULL;   /* start of previous lexeme */
+char *pMark    = NULL;   /* start of previous lexeme */
 int pLineno     = 0;      /* line # of previous lexeme */
 int pLength     = 0;      /* length of previous lexeme */
 
@@ -43,7 +44,7 @@ int Eof_read    = 0;      /* end of file has been read. it's possible for this t
 
 int (*Openp) (char *, int ) = (int (*)(char *, int)) open;
 int (*Closep) (int) = close;
-int (*Readp)(int, void *, unsigned int) = read;
+int (*Readp)(int, void *, unsigned int) = (int (*)(int, void *, unsigned int))read;
 
 void ii_io(int (*open_funct)(char *, int), 
   int (*close_funct)(int), 
@@ -83,7 +84,7 @@ int ii_newfile(char *name)
   return fd;
 }
 
-uchar *ii_text() 
+char *ii_text() 
 {
   return sMark; 
 }
@@ -98,7 +99,7 @@ int ii_lineno()
   return Lineno;
 }
 
-uchar *ii_ptext()
+char *ii_ptext()
 {
   return pMark;
 }
@@ -113,20 +114,20 @@ int ii_plineno()
   return pLineno;
 }
 
-uchar *ii_mark_start()
+char *ii_mark_start()
 {
   Mline = Lineno;
   eMark = sMark = Next;
   return sMark;
 }
 
-uchar *ii_mark_end()
+char *ii_mark_end()
 {
   Mline = Lineno;
   return (eMark = Next);
 }
 
-uchar *ii_move_start()
+char *ii_move_start()
 {
   if (sMark >= eMark) {
     return NULL;
@@ -135,13 +136,13 @@ uchar *ii_move_start()
   }
 }
 
-uchar *ii_to_mark()
+char *ii_to_mark()
 {
   Lineno = Mline;
   return (Next = eMark);
 }
 
-uchar *ii_mark_prev()
+char *ii_mark_prev()
 {
   pLineno = Lineno;
   pLength = eMark - sMark;
@@ -198,7 +199,7 @@ int ii_flush(int force)
    */
   
   int copy_amt, shift_amt;
-  uchar *left_edge;
+  char *left_edge;
 
   if (NO_MORE_CHARS()) {
     return 0;
@@ -240,7 +241,7 @@ int ii_flush(int force)
   return 1;
 }
 
-int ii_fillbuf(unsigned char *starting_at)
+int ii_fillbuf(char *starting_at)
 {
   /* fill the input buffer from starting_at to the end of the buffer.
    * The input file is not closed when EOF is reached. fuffers are read

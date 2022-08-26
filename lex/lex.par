@@ -17,7 +17,7 @@
 #endif
 
 typedef unsigned char YY_TTYPE;
-#define YYF (YY_TTYPE)(-1))
+#define YYF ((YY_TTYPE)(-1))
 
 ?
 @----------------------------------------------------------------------
@@ -29,7 +29,7 @@ typedef unsigned char YY_TTYPE;
 char  *yytext; 
 int   yyleng;
 int   yylineno;
-FILE *yyout = stdout;
+FILE *yyout;
 
 /*-----------------------------------------------------------------
  * macros that duplicate functions in UNIX lex:
@@ -54,7 +54,7 @@ int input(void) /* this is a macro in unix lex */
 {
   int c;
   if ((c = ii_input()) && (c != -1)) {
-    yytext = (char *) ii_text;
+    yytext = (char *) ii_text();
     yylineno = ii_lineno();
     ++yyleng;
   }
@@ -109,11 +109,10 @@ int yylex() {
         }
       }
     }
-        
 
     if (yynstate != YYF) {
       if (ii_advance() < 0) {
-        YYERROR("line %d, lexme too long. discarding extra characters\n", ii_lineno);
+        YYERROR("line %d, lexme too long. discarding extra characters\n", ii_lineno());
         ii_flush(1);
       }
 
@@ -171,5 +170,6 @@ int yylex() {
           yymoreflg = 0;
         }
       }
+    }
   }
 }

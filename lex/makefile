@@ -52,9 +52,11 @@ clean:
 	rm -fr set
 	rm -fr egrep
 	rm -fr dfa
+	rm -fr rlex
+	rm -fr lexyy.c
 
 OBJS	= lex.o squash.o minimize.o dfa.o nfa.o escape.o\
-	  print.o printnfa.o egrep.o set.o hash.o print.o tools.o driver.o
+	  print.o printnfa.o egrep.o set.o hash.o tools.o driver.o
 
 rlex:  $(OBJS)
 	gcc -o rlex $(OBJS)

@@ -1,4 +1,5 @@
 #ifndef _GLOBALS_H
+#define _GLOBALS_H
 
 #define MAXINP	2048			        /* maximum rule size		   */
 

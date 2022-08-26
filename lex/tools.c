@@ -118,3 +118,13 @@ void fputstr (char *str, int maxlen, FILE *fp)
     }
    }
 }
+
+void yy_init_lex()
+{
+   /* default initialization routine--does nothing */
+}
+
+int yywrap() /* yylex() halts if 1 is returned */
+{
+  return 1;
+}

@@ -13,8 +13,7 @@
 /* make an nfa from a lex input file using thompson's construction */
 
 int  Verbose	        = 0 ;	      /* print statistics		   */
-int  No_lines         = 0 ;	      /* suppress #line directives	   */
-int  Unix		          = 0 ;	      /* use UNIX-style newlines       */
+int  No_lines         = 1 ;	      /* suppress #line directives	   */
 int  Public	          = 0 ;	      /* make static symbols public    */
 char *Template        ="lex.par"; /* state-machine driver template */
 int  Actual_lineno    = 1 ;	      /* current input line number	   */

@@ -23,7 +23,7 @@ void pheader(FILE *fp, ROW dtran[], int nrows, ACCEPT *accept)
   int last_transition;
   int chars_printed;
 
-  fprintf(fp, "ifdef __NEVER__\n");
+  fprintf(fp, "#ifdef __NEVER__\n");
   fprintf(fp, "/*---------------------------------------------------\n");
   fprintf(fp, " * DFA (start state is 0) is:\n *\n");
 
@@ -94,8 +94,8 @@ void pdriver(FILE *output, int nrows, ACCEPT *accept)
       fprintf(output, "\t0  ");
     } else {
       fprintf(output, "\t%-3d",accept[i].anchor ? accept[i].anchor : 4);
-      fprintf(output, "%c    /* state %-3d */\n", i == (nrows -1) ? ' ' : ',' , i);
     }
+    fprintf(output, "%c    /* state %-3d */\n", i == (nrows -1) ? ' ' : ',' , i);
   }
 
   fprintf(output, "};\n\n");
@@ -104,13 +104,13 @@ void pdriver(FILE *output, int nrows, ACCEPT *accept)
 
   for (i = 0; i < nrows; i++) { /* case statements */
     if (accept[i].string) {
-      fprintf(output, "\t\tcase %d:\t\t\t\t\t/* state %-3d */\n",i, i);
+      fprintf(output, "\t\t\t\t\tcase %d:\t\t\t\t\t/* state %-3d */\n",i, i);
       if (!No_lines) {
         fprintf(output, "#line %d \"%s\"\n", *((int *)(accept[i].string) - 1), Input_file_name);
       }
 
-      fprintf(output, "\t\t  %s\n", accept[i].string);
-      fprintf(output, "\t\t  break;\n");
+      fprintf(output, "\t\t\t\t\t\t  %s\n", accept[i].string);
+      fprintf(output, "\t\t\t\t\t\t  break;\n");
     }
   }
 
