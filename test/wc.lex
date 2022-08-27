@@ -18,6 +18,6 @@ int main() {
   yylex();
   
   /* remove the first '\n' */
-  printf("%-3d%-3d%-3d\n", lines - 1 , words, chars - 1);
+  printf("%-8d%-8d%-8d\n", lines - 1 , words, chars - 1);
   return 0;
 }

@@ -1,6 +1,6 @@
-INCLUDE  = /root/ctools/lex/include
-LIBLEX   = /root/ctools/lex/lib/liblex.a
-LIBCOMP	 = /root/ctools/lex/lib/libcomp.a
+INCLUDE  = ../include
+LIBLEX   = liblex.a
+LIBCOMP	 = libcomp.a
 
 CC = gcc
 CFLAGS  = -I$(INCLUDE)

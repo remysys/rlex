@@ -16,7 +16,7 @@ rlex:  $(OBJS) lib
 #generate word count program
 
 test: rlex
-	./rlex -V ../test/wc.lex
+	./rlex -v ../test/wc.lex
 	gcc $(CFLAGS) -c yylex.c
 	gcc -o wc yylex.o ../lib/liblex.a
 

@@ -174,7 +174,7 @@ void signon()
     screen = stderr;
   }
 
-  fprintf(screen, "rlex %s [%s]. (c) %s, remysys.", VERSION, __DATE__,  __DATE__ + 7);
+  fprintf(screen, "rlex %s [%s]. (c) %s, ****.", VERSION, __DATE__,  __DATE__ + 7);
   fprintf(screen," all rights reserved.\n");
 
   if (screen != stderr) {
