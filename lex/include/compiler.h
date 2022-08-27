@@ -1,5 +1,31 @@
-#ifndef _SET_H
-#define _SET_H
+#ifndef _COMPILER_H
+#define _COMPILER_H
+
+
+#define max(a,b) ( ((a) > (b)) ? (a) : (b))
+#define min(a,b) ( ((a) < (b)) ? (a) : (b))
+
+#define NUMELE(a)	(sizeof(a)/sizeof(*(a)))
+#define LASTELE(a)	((a) + (NUMELE(a)-1))
+#define TOOHIGH(a, p)	((p) - (a) > (NUMELE(a) - 1))
+#define TOOLOW(a, p)	((p) - (a) <  0 )
+#define INBOUNDS(a, p)	(!(TOOHIGH(a,p) || TOOLOW(a,p)))
+
+int ferr(char *fmt, ...);
+
+/* ---------------- lex/lib/escape.c ---------------- */
+int hex2bin(int c);
+int oct2bin(int c);
+int	esc(char **s);
+char *bin_to_ascii(int c, int use_hex);
+
+/* ---------------- lex/lib/printutils.c ---------------- */
+
+void comment(FILE *fp, char *argv[]);
+void print_array(FILE *fp, int *array, int nrows, int ncols);
+void fputstr (char *str, int maxlen, FILE *fp);
+
+/* ---------------- lex/lib/set.c ---------------- */
 
 #define _BITS_IN_INT 32         /* bits in one cell */
 #define _DEFSIZE 4			    /* cells in default set */
@@ -7,11 +33,11 @@
 
 typedef struct _set_
 {
-    unsigned int nsize;		        /* # size of map */
-    unsigned char compl;		    /* is a negative true set if true */
-    unsigned int nbits;		        /* number of bits in map */
-    unsigned int *map;		        /* pointer to the map */
-    unsigned int defmap[_DEFSIZE];	/* the map itself */
+  unsigned int nsize;		        /* # size of map */
+  unsigned char compl;		    /* is a negative true set if true */
+  unsigned int nbits;		        /* number of bits in map */
+  unsigned int *map;		        /* pointer to the map */
+  unsigned int defmap[_DEFSIZE];	/* the map itself */
 } SET;
 
 typedef int (*pset_t) (void* param, char *fmt, ...);
@@ -66,4 +92,38 @@ void truncate(SET*);
 #define ADD(s, x)       (((x) >= (s)->nbits) ? _addset(s, x) : _GBIT(s, x, |=))
 #define MEMBER(s, x)    (((x) >= (s)->nbits) ? 0 : _GBIT(s, x, &))
 #define TEST(s, x)      (MEMBER(s, x)        ? !(s)->compl : (s)->compl)
-#endif 
+
+/* ---------------- lex/lib/hash.c ---------------- */
+typedef struct BUCKET {
+  struct BUCKET *next;
+  struct BUCKET **prev;
+} BUCKET;
+
+typedef struct hash_tab_ {
+  int size;
+  int numsyms;
+  unsigned int (*hash) (void *);
+  int (*cmp)(void *, void *);
+  BUCKET *table[1];
+} HASH_TAB;
+
+typedef void (*ptab_t) (void *, ...);
+
+HASH_TAB *maketab(unsigned int maxsym, unsigned int (*hash) (), int (*cmp)());
+
+void *newsym(unsigned int size);
+void freesym(void *sym);
+
+void *addsym(HASH_TAB *tabp, void *sym);
+void *findsym(HASH_TAB *tabp, void *sym);
+
+void *nextsym(HASH_TAB *tabp, void *i_last);
+void delsym(HASH_TAB *tabp, void *sym);
+int ptab(HASH_TAB *tabp, ptab_t print, void *param, int sort);
+
+unsigned int hash_add(unsigned char *name);
+
+#endif
+
+
+

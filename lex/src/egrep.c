@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "comm.h"
-#include "set.h"
+#include <compiler.h>
 #include "nfa.h"
 
 #define MAX_INT (int)(((unsigned)(~0)) >> 1)
@@ -175,12 +174,12 @@ int main(int argc, char *argv[])
    Verbose = 2;
 
   /*  1: compile the NFA; initialize move() & e_closure().
-      *  2: create the initial state, the set of all NFA states that can
-      *	   be reached by making epsilon transitions from the NFA start state.
-      *	   note that e_closure() returns the original set with elements
-      *	   added to it as necessary.
-      *  3: initialize the current state to the start state.
-      */
+   *  2: create the initial state, the set of all NFA states that can
+   *	   be reached by making epsilon transitions from the NFA start state.
+   *	   note that e_closure() returns the original set with elements
+   *	   added to it as necessary.
+   *  3: initialize the current state to the start state.
+   */
   
   Expr = argv[1];
   sstate = nfa(get_regex);

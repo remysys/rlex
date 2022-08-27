@@ -1,5 +1,7 @@
-#ifndef _INPUT_H
-#define _INPUT_H
+#ifndef _L_H
+#define _L_H
+
+/* ---------------- input.c ---------------- */
 
 void ii_io(int (*open_funct)(char *, int), int (*close_funct)(int), int (*read_funct)(int, void *, unsigned int)); 
 char *ii_text();
@@ -31,4 +33,10 @@ void ii_unput(int c);
 int ii_lookahead(int n);
 int ii_flushbuf();
 
-#endif
+/* ---------------- lexlib.c ---------------- */
+
+int yywrap( );
+void yy_init_lex();
+int ferr(char *fmt, ...);
+
+#endif 

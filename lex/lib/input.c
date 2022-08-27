@@ -5,8 +5,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "globals.h"
-#include "input.h"
+#include "l.h"
 
 /* input.c: the input system used by lex-generated lexical analyzers */
 

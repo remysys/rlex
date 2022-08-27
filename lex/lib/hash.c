@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "hash.h"
+#include <compiler.h>
 
 void *newsym(unsigned int size) 
 {

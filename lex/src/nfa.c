@@ -3,25 +3,11 @@
 #include <ctype.h>
 #include <string.h>
 #include <sys/types.h>
-#include "set.h"
-#include "hash.h"
-#include "nfa.h"
-#include "comm.h"
+#include <compiler.h>
 #include "globals.h"
-#include "escape.h"
+#include "nfa.h"
 
 /* make an nfa from a lex input file using thompson's construction */
-
-int  Verbose	        = 0 ;	      /* print statistics		   */
-int  No_lines         = 1 ;	      /* suppress #line directives	   */
-int  Public	          = 0 ;	      /* make static symbols public    */
-char *Template        ="lex.par"; /* state-machine driver template */
-int  Actual_lineno    = 1 ;	      /* current input line number	   */
-int  Lineno	          = 1 ;	      /* line number of first line of  a multiple-line rule.	   */
-char Input_buf[MAXINP];		        /* line buffer for input	   */
-char *Input_file_name;		        /* input file name (for #line   */
-FILE *Ifile;			                /* input stream.		   */
-FILE *Ofile;			                /* output stream.		   */
 
 typedef enum ERR_NUM 
 {
@@ -259,7 +245,7 @@ void parse_err(ERR_NUM type)
 
 void new_macro(char *def) 
 {
-  /* add a new macro to the table. ff two macros have the same name, the
+  /* add a new macro to the table. if two macros have the same name, the
    * second one takes precedence. a definition takes the form:
    * name <whitespace> text [<whitespace>]
    * whitespace at the end of the line is ignored.
@@ -321,9 +307,9 @@ void new_macro(char *def)
 char *get_macro(char **namep) 
 {
   /* return a pointer to the contents of a macro having the indicated
-  * name. abort with a message if no macro exists. the macro name includes
-  * the brackets. *namep is modified to point past the close brace.
-  */
+   * name. abort with a message if no macro exists. the macro name includes
+   * the brackets. *namep is modified to point past the close brace.
+   */
 
   char *p;
   MACRO *macrop;
@@ -359,121 +345,119 @@ void printmacs() /* print all the macros to stdout */
   }
 }
 
-
-
 /*----------------------------------------------------------------
- * Lexical analyzer:
+ * lexical analyzer:
  *
- * Lexical analysis is trivial because all lexemes are single-character values.
- * The only complications are escape sequences and quoted strings, both
- * of which are handled by advance(), below. This routine advances past the
+ * lexical analysis is trivial because all lexemes are single-character values.
+ * the only complications are escape sequences and quoted strings, both
+ * of which are handled by advance(), below. this routine advances past the
  * current token, putting the new token into Current_tok and the equivalent
- * lexeme into Lexeme. If the character was escaped, Lexeme holds the actual
- * value. For example, if a "\s" is encountered, Lexeme will hold a space
- * character.  The MATCH(x) macro returns true if x matches the current token.
- * Advance both modifies Current_tok to the current token and returns it.
+ * lexeme into Lexeme. if the character was escaped, lexeme holds the actual
+ * value. for example, if a "\s" is encountered, lexeme will hold a space
+ * character.  the MATCH(x) macro returns true if x matches the current token.
+ * advance both modifies Current_tok to the current token and returns it.
  *
  * macro expansion is handled by means of a stack (declared at the top
- * of the subroutine). When an expansion request is encountered, the
+ * of the subroutine). when an expansion request is encountered, the
  * current input buffer is stacked, and input is read from the macro
- * text. This process repeats with nested macros, so SSIZE controls
+ * text. this process repeats with nested macros, so SSIZE controls
  * the maximum macro-nesting depth.
  */
 
  TOKEN advance ()
  {
-    static int inquote = 0;     /* processing quoted string */
-    int saw_esc;                /* saw a backslash */
-    static char *stack[SSIZE];  /* input-source stack */
-    static char **sp = NULL;    /* stack pointer */
+  static int inquote = 0;     /* processing quoted string */
+  int saw_esc;                /* saw a backslash */
+  static char *stack[SSIZE];  /* input-source stack */
+  static char **sp = NULL;    /* stack pointer */
 
-    if (!sp) {
-        sp = &stack[-1];
-    } 
+  if (!sp) {
+      sp = &stack[-1];
+  } 
 
-    if (Current_tok == EOS) {
-      if (inquote) {
-          parse_err(E_NEWLINE); 
+  if (Current_tok == EOS) {
+    if (inquote) {
+        parse_err(E_NEWLINE); 
+    }
+    do {
+    /* sit in this loop until a non-blank line is read into	the "Input" array */
+
+      if (!(Input = input_func())) { /* then at end of file  */
+          Current_tok = END_OF_INPUT;
+          goto exit;
       }
-      do {
-      /* sit in this loop until a non-blank line is read into	the "Input" array */
 
-        if (!(Input = input_func())) { /* then at end of file  */
-            Current_tok = END_OF_INPUT;
-            goto exit;
-        }
+      while (isspace(*Input)) { /* ignore leading white space */
+          Input++;
+      }
+    } while (!*Input);  /* ignore blank lines */
 
-        while (isspace(*Input)) { /* ignore leading white space */
-            Input++;
-        }
-      } while (!*Input);  /* ignore blank lines */
+    S_input = Input;    /* remember start of line */
+  }
 
-      S_input = Input;    /* remember start of line */
+  while (*Input == '\0') {
+    if (INBOUNDS(stack, sp)) { /* restore previous input source */
+        Input = *sp--;
+        continue;
     }
 
-    while (*Input == '\0') {
-      if (INBOUNDS(stack, sp)) { /* restore previous input source */
-          Input = *sp--;
-          continue;
-      }
+    Current_tok = EOS;  /* no more input sources to restore and at the real end of string*/
+    Lexeme = '\0';
+    goto exit;
+  }
 
-      Current_tok = EOS;  /* no more input sources to restore and at the real end of string*/
+  if (!inquote) {
+    while(*Input == '{') {
+      *++sp = Input;          /* stack current input string */
+      Input = get_macro(sp);  /* use macro body as input string, *sp is modified past the close brace */
+      
+      if (TOOHIGH(stack, sp)) {
+        parse_err(E_MACDEPTH);
+      }
+    }
+  }
+
+  if (*Input == '"') {
+    inquote = ~inquote;
+    if (!*++Input) {
+      Current_tok = EOS;
       Lexeme = '\0';
       goto exit;
     }
+  }
 
-    if (!inquote) {
-      while(*Input == '{') {
-        *++sp = Input;          /* stack current input string */
-        Input = get_macro(sp);  /* use macro body as input string, *sp is modified past the close brace */
-        
-        if (TOOHIGH(stack, sp)) {
-          parse_err(E_MACDEPTH);
-        }
-      }
+  saw_esc = (*Input == '\\');
+
+  if (!inquote) {
+    if (isspace(*Input)) {
+      Current_tok = EOS;
+      Lexeme = '\0';
+      goto exit;
     }
-
-    if (*Input == '"') {
-      inquote = ~inquote;
-      if (!*++Input) {
-        Current_tok = EOS;
-        Lexeme = '\0';
-        goto exit;
-      }
-    }
-
-    saw_esc = (*Input == '\\');
-
-    if (!inquote) {
-      if (isspace(*Input)) {
-        Current_tok = EOS;
-        Lexeme = '\0';
-        goto exit;
-      }
-      Lexeme = esc(&Input);
+    Lexeme = esc(&Input);
+  } else {
+    if (saw_esc && Input[1] == '"') {
+      Input += 2;
+      Lexeme = '"';
     } else {
-      if (saw_esc && Input[1] == '"') {
-        Input += 2;
-        Lexeme = '"';
-      } else {
-        Lexeme = *Input++;
-      }
+      Lexeme = *Input++;
     }
+  }
 
-    Current_tok = (inquote || saw_esc) ? L : Tokmap[Lexeme];
+  Current_tok = (inquote || saw_esc) ? L : Tokmap[Lexeme];
 
 exit:
-    return Current_tok;
+  return Current_tok;
 }
 
 /*--------------------------------------------------------------
- * the Parser:
- *	a simple recursive descent parser that creates a Thompson NFA for
- * 	a regular expression. The access routine [thompson()] is at the
- *	bottom. the NFA is created as a directed graph, with each node
- *	containing pointer's to the next node. since the structures are
- *	allocated from an array, the machine can also be considered
- *	as an array where the state number is the array index.
+ * the parser:
+ * a simple recursive descent parser that creates a thompson NFA for
+ * a regular expression. the access routine [thompson()] is at the
+ * bottom. the NFA is created as a directed graph, with each node
+ * containing pointer's to the next node. since the structures are
+ * allocated from an array, the machine can also be considered
+ * as an array where the state number is the array index.
  */
 
 
@@ -561,24 +545,24 @@ void expr (NFA **startp, NFA **endp)
    *		do the OR
    */
 
-    NFA *e2_start;
-    NFA *e2_end;
-    NFA *p;
+  NFA *e2_start;
+  NFA *e2_end;
+  NFA *p;
 
-    cat_expr(startp, endp);
-    while (MATCH(OR)) {
-      advance();
-      cat_expr(&e2_start, &e2_end);
-      p = new();
-      p->next = *startp;
-      p->next2 = e2_start;
-      *startp = p;
+  cat_expr(startp, endp);
+  while (MATCH(OR)) {
+    advance();
+    cat_expr(&e2_start, &e2_end);
+    p = new();
+    p->next = *startp;
+    p->next2 = e2_start;
+    *startp = p;
 
-      p = new();
-      (*endp)->next = p;
-      e2_end->next = p;
-      *endp = p;
-    }
+    p = new();
+    (*endp)->next = p;
+    e2_end->next = p;
+    *endp = p;
+  }
 }
 
 
@@ -742,11 +726,12 @@ NFA *thompson(char *(*input_function)(void), int *max_state, NFA **start_state)
    * table that represents the regular expression pointed to by expr or
    * NULL if there's not enough memory. modify *max_state to reflect the
    * largest state number used. this number will probably be a larger
-   * number than the total number of states. Modify *start_state to point
-   * to the start state. This pointer is garbage if thompson() returned 0.
-   * The memory for the table is fetched from malloc(); use free() to
+   * number than the total number of states. modify *start_state to point
+   * to the start state. this pointer is garbage if thompson() returned 0.
+   * the memory for the table is fetched from malloc(); use free() to
    * discard it.
    */
+
   CLEAR_STACK();
   input_func = input_function;
 

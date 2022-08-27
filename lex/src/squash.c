@@ -2,17 +2,13 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#include "set.h"
-#include "comm.h"
+#include <compiler.h>
 #include "dfa.h"
-#include "globals.h"
-#include "tools.h"
 
 /* squash.c -- this module contains the routines to compress a table
  * horizontally and vertically by removing redundant columns and rows, and then
  * print the compressed table.
  */
-
 
 #define NCOLS	16
 #define TYPE	 "YY_TTYPE"     /* declared type of output tables.		*/

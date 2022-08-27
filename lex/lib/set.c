@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "set.h"
-#include "comm.h"
+#include <compiler.h>
 
 SET *newset() 
 {

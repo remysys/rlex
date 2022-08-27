@@ -2,10 +2,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "set.h"
-#include "dfa.h"
+#include <compiler.h>
 #include "globals.h"
-#include "nfa.h"
+#include "dfa.h"
 
 #define DTRAN_NAME "Yy_nxt" /* name used for DFA transition table. up to 
 				                     * 3 characters are appended to the end of
@@ -13,12 +12,70 @@
 
 #define E(x)  fprintf(stderr, "%s\n", x);
 
+int  Verbose	        = 0 ;	      /* print statistics		   */
+int  No_lines         = 1 ;	      /* suppress #line directives	   */
+int  Public	          = 0 ;	      /* make static symbols public    */
+char *Template        ="lex.par"; /* state-machine driver template */
+int  Actual_lineno    = 1 ;	      /* current input line number	   */
+int  Lineno	          = 1 ;	      /* line number of first line of  a multiple-line rule.	   */
+char Input_buf[MAXINP];		        /* line buffer for input	   */
+char *Input_file_name;		        /* input file name (for #line   */
+FILE *Ifile;			                /* input stream.		   */
+FILE *Ofile;			                /* output stream.		   */
+
 static int Column_compress = 1;   /* variables for command-line switches */
 static int No_compression  = 0;
 static int No_header       = 0;
 static int Header_only     = 0;
 
 #define VERSION "0.01 [gcc 4.8.5]"
+
+void lerror(int status, char *fmt, ...)
+{
+  /* print an error message and input line number. exit with
+   * indicated status if "status" is nonzero.
+   */
+  
+  va_list args;
+  va_start(args, fmt);
+  fprintf(stderr, "rlex, input line %d: ", Actual_lineno);
+  vfprintf(stderr, fmt, args);
+  va_end(args);
+
+  if (status) {
+    exit(status);
+  }
+}
+
+void strip_comments(char *string)
+{
+  /* scan through the string, replacing c-like comments with space
+   * characters. multiple-line comments are supported
+   */
+  
+  static int incomment = 0;
+  for (; *string; ++string) {
+    if (incomment) {
+      if (string[0] == '*' && string[1] == '/') {
+        incomment = 0;
+        *string++ = ' ';
+        *string = ' ';
+        continue;
+      }
+
+      if (!isspace(*string)) {
+        *string = ' ';
+      }
+
+    } else {
+      if (string[0] == '/' && string[1] == '*') {
+        incomment = 1;
+        *string++ = ' ';
+        *string = ' ';
+      }
+    }
+  }
+}
 
 static int getrule(char **stringp, int n, FILE *stream)
 {
@@ -146,7 +203,7 @@ void cmd_line_error(int usage, char *fmt, ...)
  	  E("-h  suppress (h)eader comment that describes state machine");
 	  E("-H  print the (H)eader only");
 	  E("-l  suppress #(l)ine directives in the output");
-	  E("-t  send output to standard output instead of lexyy.c");
+	  E("-t  send output to standard output instead of yylex.c");
 	  E("-v  (v)erbose mode, print statistics");
 	  E("-V  more (V)erbose, print internal diagnostics as rlex runs");
   }
@@ -155,52 +212,6 @@ void cmd_line_error(int usage, char *fmt, ...)
   exit(1);
 }
 
-void lerror(int status, char *fmt, ...)
-{
-  /* print an error message and input line number. exit with
-   * indicated status if "status" is nonzero.
-   */
-  
-  va_list args;
-  va_start(args, fmt);
-  fprintf(stderr, "rlex, input line %d: ", Actual_lineno);
-  vfprintf(stderr, fmt, args);
-  va_end(args);
-
-  if (status) {
-    exit(status);
-  }
-}
-
-void strip_comments(char *string)
-{
-  /* scan through the string, replacing c-like comments with space
-   * characters. multiple-line comments are supported
-   */
-  
-  static int incomment = 0;
-  for (; *string; ++string) {
-    if (incomment) {
-      if (string[0] == '*' && string[1] == '/') {
-        incomment = 0;
-        *string++ = ' ';
-        *string = ' ';
-        continue;
-      }
-
-      if (!isspace(*string)) {
-        *string = ' ';
-      }
-
-    } else {
-      if (string[0] == '/' && string[1] == '*') {
-        incomment = 1;
-        *string++ = ' ';
-        *string = ' ';
-      }
-    }
-  }
-}
 
 /* head processes everything up to the first %%. any lines that begin
  * with white space or are surrounded by %{ and %} are passed to the
@@ -386,9 +397,11 @@ int main(int argc, char *argv[])
   }
 
   if (!use_stdout) {
-    if (!(Ofile = fopen(Header_only ? "lexyy.h" : "lexyy.c", "w"))) {
-      cmd_line_error(0, "can't open output file lexyy.[ch]");
+    if (!(Ofile = fopen(Header_only ? "yylex.h" : "yylex.c", "w"))) {
+      cmd_line_error(0, "can't open output file yylex.[ch]");
     }
+  } else {
+    Ofile = stdout;
   }
 
   do_file();

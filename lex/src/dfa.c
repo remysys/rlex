@@ -1,18 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "set.h"
-#include "nfa.h"
-#include "dfa.h"
+#include <compiler.h>
 #include "globals.h"
+#include "dfa.h"
 
 /*----------------------------------------------------------------
  * dfa.c   make a DFA transition table from an NFA created with
  *		 thompson's construction.
- *----------------------------------------------------------------
+ *
  * Dtran is the deterministic transition table. it is indexed by state number
  * along the major axis and by input character along the minor axis. 
-*  Dstates is a list of deterministic states represented as sets of NFA states.
+ * Dstates is a list of deterministic states represented as sets of NFA states.
  * Nstates is the number of valid entries in Dtran
  */
 

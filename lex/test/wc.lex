@@ -1,5 +1,7 @@
 /* wordcount just like unix wc */
 %{
+#include <string.h>
+
 int chars = 0;
 int words = 0;
 int lines = 0;
@@ -14,6 +16,8 @@ int lines = 0;
 
 int main() {
   yylex();
-  printf("%8d%8d%8d\n", lines, words, chars);
+  
+  /* remove the first '\n' */
+  printf("%-3d%-3d%-3d\n", lines - 1 , words, chars - 1);
   return 0;
 }

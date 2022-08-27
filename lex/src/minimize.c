@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "set.h"
-#include "dfa.h"
+#include <compiler.h>
 #include "globals.h"
-#include "comm.h"
+#include "dfa.h"
 
 /* minimize.c: make a minimal DFA by eliminating equivalent states */
 
@@ -90,7 +89,7 @@ void fix_dtran(ROW **dfap, ACCEPT **acceptp)
     state = next_member(*current);
     src = &dtran[state][0];
     newaccept[current - Groups] = accept[state];
-    for (i = MAX_CHARS; --i >= 0; ) {
+    for (i = MAX_CHARS; --i >= 0; src++, dest++) {
       *dest = (*src == F) ? F : Ingroup[*src];
     }
   }
@@ -151,12 +150,12 @@ void minimize(int nstates, ROW **dfap, ACCEPT **acceptp)
     }
   } while (old_numgroups != Numgroups);
 
+  fix_dtran(dfap, acceptp);
+
   if (Verbose > 1) {
     printf("\nstates grouped as follows after minimization:\n"); 
     pgroups( nstates );
   }
-
-  fix_dtran(dfap, acceptp);
 }
 
 int min_dfa(char *(*input_function)(void), ROW **dfap, ACCEPT **acceptp) 

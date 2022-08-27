@@ -5,7 +5,6 @@
 
 extern int  Verbose;	        	      /* print statistics		   */
 extern int  No_lines;         	      /* suppress #line directives	   */
-extern int  Unix;		          	      /* use UNIX-style newlines       */
 extern int  Public;	          	      /* make static symbols public    */
 extern char *Template;         /* state-machine driver template */
 extern int  Actual_lineno;    	      /* current input line number	   */
