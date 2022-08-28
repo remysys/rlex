@@ -4,6 +4,9 @@ CFLAGS  = -I$(INCLUDE) -g
 
 #CFLAGS  = -I$(INCLUDE) -DMAIN
 
+.PHONY: all clean test
+all: rlex
+
 OBJS = lex.o squash.o printnfa.o print.o nfa.o minimize.o \
 		egrep.o dfa.o 
 

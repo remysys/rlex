@@ -5,9 +5,11 @@ LIBCOMP	 = libcomp.a
 CC = gcc
 CFLAGS  = -I$(INCLUDE)
 
+.PHONY: all clean
+
 LEX_OBJ	 = input.o ferr.o l.o
 COMP_OBJ = hash.o set.o escape.o printutils.o ferr.o
-#----------------------------------------------------------------------
+
 all: $(LIBLEX) $(LIBCOMP)
 
 $(LIBLEX):	$(LEX_OBJ)
