@@ -8,12 +8,12 @@ CFLAGS  = -I$(INCLUDE) -g
 all: rlex
 
 OBJS = lex.o squash.o printnfa.o print.o nfa.o minimize.o \
-		egrep.o dfa.o 
+	egrep.o dfa.o 
 
 lib: 
 	make -C ../lib
 
-rlex:  $(OBJS) lib
+rlex:	$(OBJS) lib
 	gcc -o $@ $(OBJS) ../lib/libcomp.a
 
 #generate word count program

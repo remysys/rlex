@@ -112,16 +112,13 @@ enum yytokentype {
 "while"			{ count(); return WHILE; }
 
 {L}({L}|{D})*		  { count(); return check_type(); }
-
 0[xX]{H}+{IS}?		{ count(); return CONSTANT; }
 0{D}+{IS}?		    { count(); return CONSTANT; }
 {D}+{IS}?		      { count(); return CONSTANT; }
 L?'(\\.|[^\\'])+'	      { count(); return CONSTANT; }
-
 {D}+{E}{FS}?		        { count(); return CONSTANT; }
 {D}*"."{D}+({E})?{FS}?	{ count(); return CONSTANT; }
 {D}+"."{D}*({E})?{FS}?	{ count(); return CONSTANT; }
-
 L?\"(\\.|[^\\"])*\"	    { count(); return STRING_LITERAL; }
 
 "..."			{ count(); return ELLIPSIS; }
@@ -194,7 +191,6 @@ void comment()
     yyerror( "End of file in comment\n" );
   }
 }
-
 
 int column = 0;
 
