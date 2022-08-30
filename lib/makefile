@@ -7,7 +7,7 @@ CFLAGS  = -I$(INCLUDE)
 
 .PHONY: all clean
 
-LEX_OBJ	 = input.o ferr.o l.o
+LEX_OBJ	 = input.o ferr.o yymain.o yywrap.o yyinitlex.o
 COMP_OBJ = hash.o set.o escape.o printutils.o ferr.o
 
 all: $(LIBLEX) $(LIBCOMP)
@@ -24,7 +24,9 @@ $(LIBCOMP):	$(COMP_OBJ)
 
 input.o:	input.c
 ferr.o:		ferr.c
-l.o: 			l.c
+yymain.o: yymain.c
+yywrap.o: yywrap.c
+yyinitlex.o: yyinitlex.c
 
 # the following routines are used by lex, but not by the
 # programs that lex generate
