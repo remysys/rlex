@@ -179,10 +179,10 @@ int dfa(char *(*input_function)(void), ROW **dfap, ACCEPT **acceptp)
 	      Nstates * MAX_CHARS * sizeof(TTYPE)	 	/* dtran  */
 	    + Nstates * sizeof(TTYPE));	 	          /* accept */
 
-      if (Verbose > 1) {
-        printf("The un-minimized DFA looks like this:\n\n");
-        pheader(stdout, Dtran, Nstates, accept_states);
-      }
+    if (Verbose > 1) {
+      printf("The un-minimized DFA looks like this:\n\n");
+      pheader(stdout, Dtran, Nstates, accept_states);
+    }
   }
 
   return Nstates;

@@ -207,30 +207,30 @@ int getword(char *buf)
 
 int main(int argc, char *argv[])
 {
-    char word[80];
-    STAB	*sp;
-    HASH_TAB	*tabp;
-    int		 c;
+  char word[80];
+  STAB	*sp;
+  HASH_TAB	*tabp;
+  int		 c;
 
-    tabp = maketab(127, hash_add, strcmp );
+  tabp = maketab(127, hash_add, strcmp );
 
-    while (getword(word)) {
-	    if (sp = (STAB *) findsym(tabp, word)) {
-	      if (strcmp(sp->str,"123456789abcdef") || (sp->hval != hash_add(word))) {
-          printf("NODE HAS BEEN ADULTERATED\n");
-          exit( 1 );
-	      }
-	      sp->count++;
-	    } else {
-          sp = newsym(sizeof(STAB));
-          strncpy(sp->name, word, 32);
-          strcpy (sp->str, "123456789abcdef");
-          sp->hval = hash_add(word);
-          addsym(tabp, sp);
-          sp->count = 1;
+  while (getword(word)) {
+    if (sp = (STAB *) findsym(tabp, word)) {
+      if (strcmp(sp->str,"123456789abcdef") || (sp->hval != hash_add(word))) {
+        printf("NODE HAS BEEN ADULTERATED\n");
+        exit( 1 );
       }
+      sp->count++;
+    } else {
+      sp = newsym(sizeof(STAB));
+      strncpy(sp->name, word, 32);
+      strcpy (sp->str, "123456789abcdef");
+      sp->hval = hash_add(word);
+      addsym(tabp, sp);
+      sp->count = 1;
     }
-    ptab(tabp, printword, NULL, 1);
+  }
+  ptab(tabp, printword, NULL, 1);
 }
 #endif
 
