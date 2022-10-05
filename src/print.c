@@ -10,12 +10,15 @@
 
 static FILE *Input_file = NULL;   /* lex.par default */
 static int Input_line;              /* line number of most-recently read line */
-static char *File_name = "lex.par"; /* template-file name */
+static char *File_name = "/usr/local/lib64/lex.par"; /* template-file name, where the lex.par be installed */
 
 FILE *driver_1(FILE *output, int lines) 
 {
-  if (!(Input_file = fopen(File_name, "r"))) {
-    return NULL;
+	
+  if (!(Input_file = fopen("lex.par", "r"))) {
+    if (!(Input_file = fopen(File_name, "r"))) {
+      return NULL;
+    }
   }
 
   Input_line = 0;

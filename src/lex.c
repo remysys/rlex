@@ -15,7 +15,6 @@
 int  Verbose	        = 0 ;	      /* print statistics		   */
 int  No_lines         = 1 ;	      /* suppress #line directives	   */
 int  Public	          = 0 ;	      /* make static symbols public    */
-char *Template        ="lex.par"; /* state-machine driver template */
 int  Actual_lineno    = 1 ;	      /* current input line number	   */
 int  Lineno	          = 1 ;	      /* line number of first line of  a multiple-line rule.	   */
 char Input_buf[MAXINP];		        /* line buffer for input	   */

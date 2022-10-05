@@ -31,10 +31,10 @@ yyinitlex.o: yyinitlex.c
 # the following routines are used by lex, but not by the
 # programs that lex generate
 
-hash.o: 			hash.c
-set.o: 				set.c
-escape.o: 		escape.c
-printutils.o: printutils.c
+hash.o:				hash.c
+set.o:				set.c
+escape.o:			escape.c
+printutils.o:	printutils.c
 ferr.o:				ferr.c
 
 clean:
