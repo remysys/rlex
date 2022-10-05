@@ -221,10 +221,10 @@ void cmd_line_error(int usage, char *fmt, ...)
  * on the line.
  */
 
-void head(int suppress_output) 
+void head(int head_only) 
 {
-  int transparent = 0; /* true if in a %{ %} block */
-  if (!suppress_output && Public) {
+  int in_codeblock = 0; /* true if in a %{ %} block */
+  if (!head_only && Public) {
     fputs("#define YYPRIVATE\n\n", Ofile);
   }
 
@@ -234,7 +234,7 @@ void head(int suppress_output)
 
   while (fgets(Input_buf, MAXINP, Ifile)) {
     ++Actual_lineno;
-    if (!transparent) { /* Don't strip comments from code blocks */
+    if (!in_codeblock) { /* Don't strip comments from code blocks */
       strip_comments(Input_buf);
     }
 
@@ -244,26 +244,26 @@ void head(int suppress_output)
 
     if (Input_buf[0] == '%') {
       if (Input_buf[1] == '%') {
-        if (!suppress_output) {
+        if (!head_only) {
           fputs("\n", Ofile);
         }
         break;
       } else {
         if (Input_buf[1] == '{') {
-          transparent = 1;
+          in_codeblock = 1;
         } else if (Input_buf[1] == '}') {
-          transparent = 0;
+          in_codeblock = 0;
         } else {
           lerror(0, "ignoring illegal %%%c directive\n", Input_buf[1]);
         }
       }
-    } else if (transparent || isspace(Input_buf[0])) {
-      if (!suppress_output) {
+    } else if (in_codeblock || isspace(Input_buf[0])) {
+      if (!head_only) {
         fputs(Input_buf, Ofile);
       }
     } else {
       new_macro(Input_buf);
-      if (!suppress_output) {
+      if (!head_only) {
         fputs("\n", Ofile); /* replace macro def with a blank 
                              * line so that the line numbers 
                              * won't get messed up.
