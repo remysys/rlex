@@ -31,7 +31,7 @@ uninstall:
 #generate word count program
 
 test:
-	rlex -v ../test/wc.lex
+	rlex ../test/wc.lex
 	gcc -o wc yylex.c -llex
 
 clean:

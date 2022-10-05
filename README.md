@@ -7,8 +7,8 @@ rlex is a tool program for generating lexical analyzers (scanners). It supports 
 Usage
 -----------
 ```
-$ cd src && make rlex
-$ ./rlex 
+$ cd src && make && make install
+$ rlex 
 rlex 0.01 [gcc 4.8.5] [Aug 28 2022]. (c) 2022, ****. all rights reserved.
 rlex: file name required
 
@@ -24,13 +24,12 @@ usage is: rlex [options] file
 generate a word count program that, like the utility wc
 
 ```
-$ ./rlex ../test/wc.lex 
-$ gcc -I../include -g -c yylex.c
-$ gcc -o wc yylex.o ../lib/liblex.a
-$ ./wc < $file
+$ rlex ../test/wc.lex
+$ gcc -o wc yylex.c -llex
+$ ./wc $filename
 ```
 
-run 'make test' to generate the wc test program
+or run 'make test' to generate the wc test program
 ```
 $ make test
 ```
