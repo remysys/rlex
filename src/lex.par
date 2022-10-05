@@ -9,7 +9,7 @@
  */
 
 #include <stdio.h>
-#include "l.h"	 /* prototoyptes for the ii_ functions */
+#include <rlex/l.h>	 /* prototoyptes for the ii_ functions */
 
 
 #ifndef YYPRIVATE
