@@ -59,7 +59,7 @@ int input(void) /* this is a macro in unix lex */
     ++yyleng;
   }
 
-  return -1;
+  return c;
 }
 
 
