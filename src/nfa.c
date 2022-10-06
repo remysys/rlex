@@ -84,7 +84,7 @@ NFA *new()
   static int first_time = 1;
   if (first_time) {
     if (!(Nfa_states = (NFA *)calloc(NFA_MAX, sizeof(NFA)))) {
-        parse_err(E_MEM);
+      parse_err(E_MEM);
     }
     first_time = 0;
     Sp = &Sstack[-1];
@@ -105,7 +105,7 @@ void discard (NFA *nfa)
   nfa->edge = EMPTY;
   PUSH(nfa);
   if (!STACK_OK()) {
-      parse_err(E_STACK);
+    parse_err(E_STACK);
   }
 }
 
@@ -118,7 +118,7 @@ char *save(char *str)
   
   if (first_time) {
     if (!(savep = strings = (int *)malloc(STR_MAX))) {
-        parse_err(E_MEM);
+      parse_err(E_MEM);
     }
     first_time = 0;
   }
@@ -137,7 +137,7 @@ char *save(char *str)
   char *textp;
   for (textp = (char *)savep; *str; *textp++ = *str++) {
     if (textp >= (char *)strings + (STR_MAX - 1)) {
-        parse_err(E_STRINGS);
+      parse_err(E_STRINGS);
     }
   }
 
@@ -228,7 +228,7 @@ void errmsg(int type, char *table[], char *msgtype)
   fprintf(stderr, "%s (line %d) %s\n", msgtype, Actual_lineno, table[type]);
   
   for (p = S_input; ++p <= Input; putc('-', stderr))
-      ;
+    ;
   fprintf(stderr, "v\n%s\n", S_input);
   exit(1);
 }
@@ -262,7 +262,7 @@ void new_macro(char *def)
   }
 
   for (name = def; *def && !isspace(*def); def++)
-      ;
+    ;
   
   if (*def) {
     *def++ = '\0';
@@ -372,23 +372,23 @@ void printmacs() /* print all the macros to stdout */
   static char **sp = NULL;    /* stack pointer */
 
   if (!sp) {
-      sp = &stack[-1];
+    sp = &stack[-1];
   } 
 
   if (Current_tok == EOS) {
     if (inquote) {
-        parse_err(E_NEWLINE); 
+      parse_err(E_NEWLINE); 
     }
     do {
     /* sit in this loop until a non-blank line is read into	the "Input" array */
 
       if (!(Input = input_func())) { /* then at end of file  */
-          Current_tok = END_OF_INPUT;
-          goto exit;
+        Current_tok = END_OF_INPUT;
+        goto exit;
       }
 
       while (isspace(*Input)) { /* ignore leading white space */
-          Input++;
+        Input++;
       }
     } while (!*Input);  /* ignore blank lines */
 
@@ -397,8 +397,8 @@ void printmacs() /* print all the macros to stdout */
 
   while (*Input == '\0') {
     if (INBOUNDS(stack, sp)) { /* restore previous input source */
-        Input = *sp--;
-        continue;
+      Input = *sp--;
+      continue;
     }
 
     Current_tok = EOS;  /* no more input sources to restore and at the real end of string*/
@@ -614,7 +614,6 @@ void factor (NFA **startp , NFA **endp) {
   NFA *end;
   term(startp, endp);
   if (MATCH(CLOSURE) || MATCH(PLUS_CLOSE) || MATCH(OPTIONAL)) {
-      
     start = new();
     end = new();
     start->next = *startp;
@@ -652,7 +651,7 @@ void term(NFA **startp, NFA **endp) {
     if (MATCH(CLOSE_PAREN)) {
       advance();
     } else {
-        parse_err(E_PAREN);
+      parse_err(E_PAREN);
     }
   } else {
     *startp = start = new();
@@ -712,7 +711,7 @@ void dodash(SET *set)
         ADD(set, Lexeme);
       } else {
         for (; first <= Lexeme; first++) {
-            ADD(set, first);
+          ADD(set, first);
         }
       }
     }
@@ -763,9 +762,9 @@ char *getstr()
   static char bufs[80];
   printf("%d: ", Lineno++);
   if (fgets(bufs, NUMELE(bufs), stdin)) {
-      return bufs;
+    return bufs;
   } else {
-      return NULL;
+    return NULL;
   }
 }
 
