@@ -1,8 +1,8 @@
-INCLUDE  = ../include
+INCLUDE = ../include
 CC = gcc
-CFLAGS  = -I$(INCLUDE) -g
+CFLAGS = -I$(INCLUDE) -g
 
-#CFLAGS  = -I$(INCLUDE) -DMAIN
+#CFLAGS = -I$(INCLUDE) -DMAIN
 
 .PHONY: all clean test install uninstall
 all: rlex
@@ -13,7 +13,7 @@ OBJS = lex.o squash.o printnfa.o print.o nfa.o minimize.o \
 lib:
 	make -C ../lib
 
-rlex:  $(OBJS) lib
+rlex: $(OBJS) lib
 	gcc -o $@ $(OBJS) ../lib/libcomp.a
 
 
@@ -43,11 +43,11 @@ clean:
 	rm -fr wc
 	make -C ../lib clean
 
-lex.o:				lex.c
-squash.o:			squash.c
-printnfa.o:		printnfa.c
-print.o:			print.c
-nfa.o:				nfa.c
-minimize.o:		minimize.c
-egrep.o:			egrep.c
-dfa.o:				dfa.c
+lex.o:      lex.c
+squash.o:   squash.c
+printnfa.o: printnfa.c
+print.o:    print.c
+nfa.o:      nfa.c
+minimize.o: minimize.c
+egrep.o:    egrep.c
+dfa.o:      dfa.c
