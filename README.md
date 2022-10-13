@@ -16,7 +16,7 @@ usage is: rlex [options] file
 -f  for (f)ast. don't compress tables
 -h  suppress (h)eader comment that describes state machine
 -l  suppress #(l)ine directives in the output
--t  send output to standard output instead of yylex.c
+-t  send output to standard output instead of lex.yy.c
 -v  (v)erbose mode, print statistics
 -V  more (V)erbose, print internal diagnostics as rlex runs
 ```
@@ -25,7 +25,7 @@ generate a word count program that, like the utility wc
 
 ```
 $ rlex ../test/wc.lex
-$ gcc -o wc yylex.c -llex
+$ gcc -o wc lex.yy.c -llex
 $ ./wc $filename
 ```
 

@@ -202,7 +202,7 @@ void cmd_line_error(int usage, char *fmt, ...)
  	  E("-h  suppress (h)eader comment that describes state machine");
 	  E("-H  print the (H)eader only");
 	  E("-l  suppress #(l)ine directives in the output");
-	  E("-t  send output to standard output instead of yylex.c");
+	  E("-t  send output to standard output instead of lex.yy.c");
 	  E("-v  (v)erbose mode, print statistics");
 	  E("-V  more (V)erbose, print internal diagnostics as rlex runs");
   }
@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
   }
 
   if (!use_stdout) {
-    if (!(Ofile = fopen(Header_only ? "yylex.h" : "yylex.c", "w"))) {
+    if (!(Ofile = fopen(Header_only ? "lex.yy.h" : "lex.yy.c", "w"))) {
       cmd_line_error(0, "can't open output file yylex.[ch]");
     }
   } else {

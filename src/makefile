@@ -34,12 +34,12 @@ uninstall:
 
 test:
 	rlex ../test/wc.lex
-	gcc -o wc yylex.c -llex
+	gcc -o wc lex.yy.c -llex
 
 clean:
 	rm -fr *.o
 	rm -fr rlex
-	rm -fr yylex.c
+	rm -fr lex.yy.c
 	rm -fr wc
 	make -C ../lib clean
 
