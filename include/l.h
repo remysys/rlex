@@ -34,10 +34,36 @@ void ii_unput(int c);
 int ii_lookahead(int n);
 int ii_flushbuf();
 
-/* ---------------- lexlib.c ---------------- */
-
+/* ---------------- yywrap.c ---------------- */
 int yywrap( );
+
+/* ---------------- yyinitlex.c ---------------- */
 void yy_init_lex();
+
+/* ---------------- ferr.c ---------------- */
 int ferr(char *fmt, ...);
+
+/* ---------------- yyinitox.c -------------*/
+void yy_init_rbison(void *tos);
+
+extern FILE  *yycodeout;    /* output stream (code) */
+extern FILE  *yybssout;     /* output stream (bss ) */
+extern FILE  *yydataout;    /* output stream (data) */
+
+extern char *yytext;        /* declared by lex in lex.yy.c */
+extern int  yylineno;
+extern int  yyleng;
+
+void  yycode      (char *fmt, ...);
+void  yydata      (char *fmt, ...); 
+void  yybss      (char *fmt, ...);
+void  yyerror     (char *fmt, ...);
+void  yycomment   (char *fmt, ...);
+int yyparse (void);
+int yylex (void);
+
+extern char *yytext;
+extern int yyleng;
+extern int yylineno;
 
 #endif 

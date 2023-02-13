@@ -19,22 +19,21 @@ rlex: $(OBJS) lib
 
 install:
 	sudo cp -fr rlex /usr/local/bin/
-	sudo cp -fr ../lib/liblex.a /usr/local/lib64/
 	sudo cp -fr lex.par /usr/local/lib64/
-	sudo mkdir -p /usr/local/include/rlex
-	sudo cp -fr ../include/l.h /usr/local/include/rlex/
+	sudo cp -fr ../lib/libl.a /usr/local/lib64/
+	sudo cp -fr ../include/l.h /usr/local/include/
 
 uninstall:
 	sudo rm -fr /usr/local/bin/rlex
 	sudo rm -fr /usr/local/lib64/lex.par
-	sudo rm -fr /usr/local/lib64/liblex.a
-	sudo rm -fr /usr/local/include/rlex
+	sudo rm -fr /usr/local/lib64/libl.a
+	sudo rm -fr /usr/local/include/l.h
   
 #generate word count program
 
 test:
 	rlex ../test/wc.lex
-	gcc -o wc lex.yy.c -llex
+	gcc -o wc lex.yy.c -ll
 
 clean:
 	rm -fr *.o

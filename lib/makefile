@@ -1,5 +1,5 @@
 INCLUDE = ../include
-LIBLEX  = liblex.a
+LIBL  = libl.a
 LIBCOMP = libcomp.a
 
 CC = gcc
@@ -7,14 +7,14 @@ CFLAGS = -I$(INCLUDE)
 
 .PHONY: all clean
 
-LEX_OBJ  = input.o ferr.o yymain.o yywrap.o yyinitlex.o
+L_OBJ  = input.o ferr.o yymain.o yywrap.o yyinitlex.o
 COMP_OBJ = hash.o set.o escape.o printutils.o ferr.o
 
-all: $(LIBLEX) $(LIBCOMP)
+all: $(LIBL) $(LIBCOMP)
 
-$(LIBLEX): $(LEX_OBJ)
-	rm -fr $(LIBLEX)
-	ar rvs $(LIBLEX) $(LEX_OBJ)
+$(LIBL): $(L_OBJ)
+	rm -fr $(LIBL)
+	ar rvs $(LIBL) $(L_OBJ)
 
 $(LIBCOMP): $(COMP_OBJ)
 	rm -fr $(LIBCOMP)
@@ -38,5 +38,5 @@ printutils.o: printutils.c
 ferr.o:       ferr.c
 
 clean:
-	rm -fr $(LEX_OBJ) $(LIBLEX)
+	rm -fr $(L_OBJ) $(LIBL)
 	rm -fr $(COMP_OBJ) $(LIBCOMP)
