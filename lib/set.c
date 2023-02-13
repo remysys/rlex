@@ -85,7 +85,7 @@ void enlarge(int need, SET *set) {
   set->nbits = set->nsize * _BITS_IN_INT;
 }
 
-int	_addset(SET *set, int bit)
+int _addset(SET *set, int bit)
 {
   enlarge(_ROUND(bit), set);
   return _GBIT(set, bit, |=);

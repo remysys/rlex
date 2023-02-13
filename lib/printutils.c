@@ -17,7 +17,7 @@ void comment(FILE *fp, char *argv[])
 
 /* general-purpose subroutine to print out a 2-dimensional array */
 
-#define NCOLS	 10   	/* number of columns used to print arrays	*/
+#define NCOLS 10    /* number of columns used to print arrays */
 
 void print_array(FILE *fp, int *array, int nrows, int ncols)
 {

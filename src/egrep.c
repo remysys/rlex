@@ -34,7 +34,7 @@ SET *e_closure(SET *input, char **accept, int *anchor)
 {
   /* input is the set of start states to examine.
    * *accept  is modified to point at the string associated with an accepting
-   *	        state (or to NULL if the state isn't an accepting state).
+   * state (or to NULL if the state isn't an accepting state).
    * *anchor  is modified to hold the anchor point, if any.
    *
    * computes the epsilon closure set for the input states. The output set
@@ -176,9 +176,9 @@ int main(int argc, char *argv[])
 
   /*  1: compile the NFA; initialize move() & e_closure().
    *  2: create the initial state, the set of all NFA states that can
-   *	   be reached by making epsilon transitions from the NFA start state.
-   *	   note that e_closure() returns the original set with elements
-   *	   added to it as necessary.
+   *    be reached by making epsilon transitions from the NFA start state.
+   *    note that e_closure() returns the original set with elements
+   *    added to it as necessary.
    *  3: initialize the current state to the start state.
    */
   

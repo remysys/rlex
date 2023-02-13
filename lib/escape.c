@@ -31,16 +31,16 @@ int esc(char **s)
    * sequence is present, the current character is returned and the string
    * is advanced by one. The following are recognized:
    *
-   *	\b	backspace
-   *	\f	formfeed
-   *	\n	newline
-   *	\r	carriage return
-   *	\s	space
-   *	\t	tab
-   *	\e	ASCII ESC character ('\033')
-   *	\DDD	number formed of 1-3 octal digits
-   *	\xDDD	number formed of 1-3 hex digits
-   *	\^C	C = any letter. Control code
+   * \b backspace
+   * \f formfeed
+   * \n newline
+   * \r carriage return
+   * \s space
+   * \t tab
+   * \e ASCII ESC character ('\033')
+   * \DDD number formed of 1-3 octal digits
+   * \xDDD number formed of 1-3 hex digits
+   * \^C C = any letter. Control code
    */
 
   int rval;

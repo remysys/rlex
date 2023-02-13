@@ -11,9 +11,9 @@
  * print the compressed table.
  */
 
-#define NCOLS	16
-#define TYPE	 "YY_TTYPE"     /* declared type of output tables.		*/
-#define SCLASS   "YYPRIVATE"  /* storage class of all the tables		*/
+#define NCOLS 16
+#define TYPE  "YY_TTYPE"     /* declared type of output tables.  */
+#define SCLASS "YYPRIVATE"   /* storage class of all the tables  */
 
 int Col_map[MAX_CHARS];
 int Row_map[DFA_MAX];
@@ -63,8 +63,8 @@ void reduce(ROW *dtran, int *p_nrows, int *p_ncols)
 
   for (r_ncols = 0; ;r_ncols++) {
     /* skip past any states in the Col_map that have already been
-	    * processed. If the entire Col_map has been processed, break
-	    */
+     * processed. If the entire Col_map has been processed, break
+     */
     for (i = r_ncols; Col_map[i] == -1 && i < ncols; i++) {
       ;
     }
@@ -142,9 +142,9 @@ void pmap(FILE *fp, int *p,  int n )
   /*print a one-dimensional array */
   int i;
   for (i = 0; i < (n - 1); i++) {
-	  fprintf(fp, "%3d," , *p++);
-	  if ((i % NCOLS) == NCOLS - 1) {
-     	fprintf(fp, "\n     "); 
+    fprintf(fp, "%3d," , *p++);
+    if ((i % NCOLS) == NCOLS - 1) {
+      fprintf(fp, "\n     "); 
     }
   }
 
@@ -153,7 +153,7 @@ void pmap(FILE *fp, int *p,  int n )
 
 void print_col_map(FILE *fp)
 {
-  static char	*text[] = {
+  static char *text[] = {
       "The Yy_cmap[] and Yy_rmap arrays are used as follows:",
       "",
       " next_state= Yydtran[ Yy_rmap[current_state] ][ Yy_cmap[input_char] ];",
@@ -208,7 +208,7 @@ void cnext(FILE *fp, char *name)
 {
   /* print out a yy_next(state,c) subroutine for the compressed table */
 
-  static char	*text[] = {
+  static char *text[] = {
     "yy_next(state,c) is given the current state number and input",
     "character and evaluates to the next state.",
     NULL

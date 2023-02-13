@@ -9,7 +9,7 @@
  */
 
 #include <stdio.h>
-#include <l.h>	 /* prototoyptes for the ii_ functions */
+#include <l.h> /* prototoyptes for the ii_ functions */
 
 
 #ifndef YYPRIVATE
@@ -22,7 +22,7 @@ typedef unsigned char YY_TTYPE;
 ?
 @----------------------------------------------------------------------
 @
-@	the tables, etc. go here.
+@the tables, etc. go here.
 @
 @----------------------------------------------------------------------
 
@@ -86,10 +86,10 @@ int yylex() {
 
   while(1) {
     /* check end of file. if there's an unprocessed accepting state,
-	   * yylastaccept will be nonzero. in this case, ignore EOF for now so
-	   * that you can do the accepting action; otherwise, try to open another
-	   * file and return if you can't.
-	   */
+     * yylastaccept will be nonzero. in this case, ignore EOF for now so
+     * that you can do the accepting action; otherwise, try to open another
+     * file and return if you can't.
+     */
 
     while(1) {
       if ((yylook = ii_look(1)) != EOF) {
@@ -148,10 +148,10 @@ int yylex() {
 
         switch(yylastaccept) {
 ?
-          @		   +-----------------------------------------------------------+
-          @		   | The case statements associated with the accepting strings |
-          @		   | go here						       |
-          @		   +-----------------------------------------------------------+
+          @      +-----------------------------------------------------------+
+          @      | The case statements associated with the accepting strings |
+          @      | go here                                                   |
+          @      +-----------------------------------------------------------+
           @
 
           default: 

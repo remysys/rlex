@@ -21,7 +21,7 @@ void free_nfa();                                          /* egerp.c */
 SET *move(SET *inp_set, int c);                           /* egrep.c */
 int nfa(char* (*input_function) (void));                  /* egrep.c */
 
-int dfa( char *(*input_function)(void), ROW **dfap,  ACCEPT**	acceptp);          /* dfa.c   */
+int dfa( char *(*input_function)(void), ROW **dfap,  ACCEPT** acceptp);          /* dfa.c   */
 
 void pheader(FILE *fp, ROW dtran[], int nrows, ACCEPT *accept); /* print.c */
 void pdriver(FILE *output, int nrows, ACCEPT *accept);          /* print.c */

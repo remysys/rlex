@@ -9,19 +9,19 @@ int lines = 0;
 
 %%
 
-[a-zA-Z]+	{ words++; chars += strlen(yytext); }
-\n		    { chars++; lines++; }
-.		      { chars++; }
+[a-zA-Z]+ { words++; chars += strlen(yytext); }
+\n        { chars++; lines++; }
+.         { chars++; }
 %%
 
 int main (int argc, char *argv[]) {
-	if (argc != 2) {
-		printf("usage: wc $filename\n");
-		return 0;
-	}
+  if (argc != 2) {
+    printf("usage: wc $filename\n");
+    return 0;
+  }
 
-	ii_newfile(argv[1]);
-	yylex();
+  ii_newfile(argv[1]);
+  yylex();
   
   /* remove the first '\n' */
   printf("%-8d%-8d%-8d%-8s\n", lines - 1 , words, chars - 1, argv[1]);

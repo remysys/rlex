@@ -14,19 +14,19 @@
 
 typedef enum ERR_NUM 
 {
-  E_MEM,	    /* out of memory				                */
-  E_BADEXPR,	/* malformed regular expression			    */
-  E_PAREN,  	/* missing close parenthesis			      */
-  E_STACK,	    /* internal error: discard stack full	  */
-  E_LENGTH,	    /* too many regular expressions 		    */
-  E_BRACKET,	/* missing [ in character class			    */
-  E_BOL,	    /* ^ must be at start of expr or ccl	  */
-  E_CLOSE,	    /* + ? or * must follow expression		  */
-  E_STRINGS,	/* too many characters in accept actions*/
-  E_NEWLINE,	/* newline in quoted string			        */
-  E_BADMAC,	    /* missing } in macro expansion			    */
-  E_NOMAC,	    /* macro doesn't exist				          */
-  E_MACDEPTH    /* macro expansions nested too deeply.	*/
+  E_MEM,      /* out of memory                         */
+  E_BADEXPR,  /* malformed regular expression          */
+  E_PAREN,    /* missing close parenthesis             */
+  E_STACK,    /* internal error: discard stack full    */
+  E_LENGTH,   /* too many regular expressions          */
+  E_BRACKET,  /* missing [ in character class          */
+  E_BOL,      /* ^ must be at start of expr or ccl     */
+  E_CLOSE,    /* + ? or * must follow expression       */
+  E_STRINGS,  /* too many characters in accept actions */
+  E_NEWLINE,  /* newline in quoted string              */
+  E_BADMAC,   /* missing } in macro expansion          */
+  E_NOMAC,    /* macro doesn't exist                   */
+  E_MACDEPTH  /* macro expansions nested too deeply    */
 } ERR_NUM;
 
 char *Errmsgs[] =  /* indexed by ERR_NUM */
@@ -48,8 +48,8 @@ char *Errmsgs[] =  /* indexed by ERR_NUM */
 
 typedef enum WARN_NUM
 {
-  W_STARTDASH, /* dash at start of character class	*/
-  W_ENDDASH    /* dash at end of character class	  */
+  W_STARTDASH, /* dash at start of character class */
+  W_ENDDASH    /* dash at end of character class   */
 } WARN_NUM;
 
 char *Warnmsgs[] = /* indexed by WARN_NUM */
@@ -189,27 +189,27 @@ typedef enum TOKEN
 
 TOKEN Tokmap[] =
 {
-/*  ^@  ^A  ^B  ^C  ^D  ^E  ^F  ^G  ^H  ^I  ^J  ^K  ^L  ^M  ^N	^O*/
+/*  ^@  ^A  ^B  ^C  ^D  ^E  ^F  ^G  ^H  ^I  ^J  ^K  ^L  ^M  ^N ^O*/
      L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,
 
-/*  ^P  ^Q  ^R  ^S  ^T  ^U  ^V  ^W  ^X  ^Y  ^Z  ^[  ^\  ^]	^^  ^_*/
+/*  ^P  ^Q  ^R  ^S  ^T  ^U  ^V  ^W  ^X  ^Y  ^Z  ^[  ^\  ^] ^^  ^_*/
      L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,
 
-/*  SPACE  !   "   #    $        %   &    '	  (                 )           *         +       ,    -      .    / */
+/*  SPACE  !   "   #    $        %   &    '   (                 )           *         +       ,    -      .    / */
       L,   L,  L,  L,   AT_EOL,  L,  L,   L,  OPEN_PAREN,  CLOSE_PAREN,  CLOSURE, PLUS_CLOSE, L,  DASH,  ANY,  L,
 
 
-/*  0   1   2   3   4   5   6   7   8   9   :   ;   <   =	>      ?     */
+/*  0   1   2   3   4   5   6   7   8   9   :   ;   <   = >      ?     */
     L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  OPTIONAL, 
 
-/*  @   A   B   C   D   E   F   G   H   I   J   K   L   M   N	O*/
+/*  @   A   B   C   D   E   F   G   H   I   J   K   L   M   N O*/
     L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,
 
-/*  P   Q   R   S   T   U   V   W   X   Y   Z     [		  \	    ]		  ^      _  */
+/*  P   Q   R   S   T   U   V   W   X   Y   Z     [    \     ]    ^      _  */
     L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L, CCL_START, L,  CCL_END,  AT_BOL,  L,
 
 
-/*  `   a   b   c   d   e   f   g   h   i   j   k   l   m	n   o*/
+/*  `   a   b   c   d   e   f   g   h   i   j   k   l   m n   o*/
     L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,  L,
 
 /*  p   q   r   s   t   u   v   w   x   y   z      {        |      }           ~, DEL*/
@@ -383,7 +383,7 @@ void printmacs() /* print all the macros to stdout */
       parse_err(E_NEWLINE); 
     }
     do {
-    /* sit in this loop until a non-blank line is read into	the "Input" array */
+    /* sit in this loop until a non-blank line is read into the "Input" array */
 
       if (!(Input = input_func())) { /* then at end of file  */
         Current_tok = END_OF_INPUT;
@@ -482,12 +482,12 @@ NFA *machine()
 
 NFA *rule() 
 {
-  /*	rule	--> expr  EOS action
-   *		    ^expr EOS action
-   *		    expr$ EOS action
+  /*rule --> expr  EOS action
+   *      ^expr EOS action
+   *      expr$ EOS action
    *
-   *	action	--> <tabs> <string of characters>
-   *		    epsilon
+   *action --> <tabs> <string of characters>
+   *      epsilon
    *  action  --> white_space string
    *          white_space
    *          epsilon    
@@ -531,21 +531,21 @@ void expr (NFA **startp, NFA **endp)
   /* because a recursive descent compiler can't handle left recursion,
    * the productions:
    *
-   *	expr	-> expr OR cat_expr
-   *		|  cat_expr
+   * expr -> expr OR cat_expr
+   *   |  cat_expr
    *
    * must be translated into:
    *
-   *	expr	-> cat_expr expr'
-   *	expr'	-> OR cat_expr expr'
-   *		   epsilon
+   * expr -> cat_expr expr'
+   * expr'-> OR cat_expr expr'
+   *   | epsilon
    *
    * which can be implemented with this loop:
    *
-   *	cat_expr
-   *	while( match(OR) )
-   *		cat_expr
-   *		do the OR
+   * cat_expr
+   * while( match(OR) )
+   *  cat_expr
+   *  do the OR
    */
 
   NFA *e2_start;
@@ -584,14 +584,14 @@ void cat_expr(NFA **startp, NFA **endp)
   /* the same translations that were needed in the expr rules are needed again
    * here:
    *
-   *	cat_expr  -> cat_expr factor
-   *		     factor
+   * cat_expr  -> cat_expr factor
+   *       | factor
    *
    * is translated to:
    *
-   *	cat_expr  -> factor cat_expr'
-   *	cat_expr' -> | factor cat_expr'
-   *		     epsilon
+   * cat_expr  -> factor cat_expr'
+   * cat_expr' -> factor cat_expr'
+   *       | epsilon
    */
 
   NFA *e2_start;
@@ -612,7 +612,7 @@ void cat_expr(NFA **startp, NFA **endp)
 
 void factor (NFA **startp , NFA **endp) {
 
-  /*  factor	--> term*  | term+  | term? | term */
+  /*  factor --> term*  | term+  | term? | term */
   NFA *start;
   NFA *end;
   term(startp, endp);
@@ -720,7 +720,7 @@ void dodash(SET *set)
     }
   }
 }
-	
+ 
 
 NFA *thompson(char *(*input_function)(void), int *max_state, NFA **start_state)
 {

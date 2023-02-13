@@ -16,7 +16,7 @@ static char *File_name = "/usr/local/lib64/lex.par"; /* template-file name, wher
 
 FILE *driver_1(FILE *output, int lines) 
 {
-	
+ 
   if (!(Input_file = fopen("lex.par", "r"))) {
     if (!(Input_file = fopen(File_name, "r"))) {
       return NULL;
@@ -91,7 +91,7 @@ void pheader(FILE *fp, ROW dtran[], int nrows, ACCEPT *accept)
     } else {
       fprintf(fp, " * State %d [accepting, line %d <", i, ((int *)(accept[i].string))[-1]);
       fputstr(accept[i].string, 20, fp);
-	    fprintf(fp, ">]");
+      fprintf(fp, ">]");
       if (accept[i].anchor) {
         fprintf(fp, "Anchor: %s%s", accept[i].anchor & START ? "start" : "",
                                     accept[i].anchor & END ? "end" : "");
@@ -149,9 +149,9 @@ void pdriver(FILE *output, int nrows, ACCEPT *accept)
 
   for (i = 0; i < nrows; i++) { /*accepting array */
     if (!accept[i].string) {
-      fprintf(output, "\t0  ");
+      fprintf(output, "  0  ");
     } else {
-      fprintf(output, "\t%-3d",accept[i].anchor ? accept[i].anchor : 4);
+      fprintf(output, "  %-3d",accept[i].anchor ? accept[i].anchor : 4);
     }
     fprintf(output, "%c    /* state %-3d */\n", i == (nrows -1) ? ' ' : ',' , i);
   }
@@ -162,13 +162,13 @@ void pdriver(FILE *output, int nrows, ACCEPT *accept)
 
   for (i = 0; i < nrows; i++) { /* case statements */
     if (accept[i].string) {
-      fprintf(output, "\t\t\t\t\tcase %d:\t\t\t\t\t/* state %-3d */\n",i, i);
+      fprintf(output, "          case %d:          /* state %-3d */\n",i, i);
       if (!No_lines) {
         fprintf(output, "#line %d \"%s\"\n", *((int *)(accept[i].string) - 1), Input_file_name);
       }
 
-      fprintf(output, "\t\t\t\t\t\t  %s\n", accept[i].string);
-      fprintf(output, "\t\t\t\t\t\t  break;\n");
+      fprintf(output, "              %s\n", accept[i].string);
+      fprintf(output, "              break;\n");
     }
   }
 

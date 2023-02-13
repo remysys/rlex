@@ -8,7 +8,7 @@
 
 /*----------------------------------------------------------------
  * dfa.c   make a DFA transition table from an NFA created with
- *		 thompson's construction.
+ * thompson's construction.
  *
  * Dtran is the deterministic transition table. it is indexed by state number
  * along the major axis and by input character along the minor axis. 
@@ -175,10 +175,10 @@ int dfa(char *(*input_function)(void), ROW **dfap, ACCEPT **acceptp)
   *acceptp = accept_states;
 
   if (Verbose) {
-	  printf("\n%d out of %d DFA states in initial machine.\n", Nstates, DFA_MAX);
+    printf("\n%d out of %d DFA states in initial machine.\n", Nstates, DFA_MAX);
     printf("%d bytes required for uncompressed tables.\n\n",
-	      Nstates * MAX_CHARS * sizeof(TTYPE)	 	/* dtran  */
-	    + Nstates * sizeof(TTYPE));	 	          /* accept */
+       Nstates * MAX_CHARS * sizeof(TTYPE)   /* dtran  */
+       + Nstates * sizeof(TTYPE));           /* accept */
 
     if (Verbose > 1) {
       printf("The un-minimized DFA looks like this:\n\n");

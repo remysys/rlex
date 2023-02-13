@@ -9,20 +9,20 @@
 #include "nfa.h"
 
 #define DTRAN_NAME "Yy_nxt" /* name used for DFA transition table. up to 
-				                     * 3 characters are appended to the end of
-				                     * this name in the row-compressed tables.   */
+                             * 3 characters are appended to the end of
+                             * this name in the row-compressed tables.   */
 
 #define E(x)  fprintf(stderr, "%s\n", x);
 
-int  Verbose	        = 0 ;	      /* print statistics		   */
-int  No_lines         = 1 ;	      /* suppress #line directives	   */
-int  Public	          = 0 ;	      /* make static symbols public    */
-int  Actual_lineno    = 1 ;	      /* current input line number	   */
-int  Lineno	          = 1 ;	      /* line number of first line of  a multiple-line rule.	   */
-char Input_buf[MAXINP];		        /* line buffer for input	   */
-char *Input_file_name;		        /* input file name (for #line   */
-FILE *Ifile;			                /* input stream.		   */
-FILE *Ofile;			                /* output stream.		   */
+int  Verbose          = 0 ;       /* print statistics */
+int  No_lines         = 1 ;       /* suppress #line directives */
+int  Public           = 0 ;       /* make static symbols public */
+int  Actual_lineno    = 1 ;       /* current input line number */
+int  Lineno           = 1 ;       /* line number of first line of  a multiple-line rule */
+char Input_buf[MAXINP];           /* line buffer for input */
+char *Input_file_name;            /* input file name (for #line */
+FILE *Ifile;                      /* input stream */
+FILE *Ofile;                      /* output stream */
 
 static int Column_compress = 1;   /* variables for command-line switches */
 static int No_compression  = 0;
@@ -87,7 +87,7 @@ static int getrule(char **stringp, int n, FILE *stream)
    *
    * return the character following the \n normally,
    *   EOF  at end of file,
-   *	 0 if the line is too long.
+   *   0 if the line is too long.
    */
   
   static int lookahead = 0;
@@ -200,13 +200,13 @@ void cmd_line_error(int usage, char *fmt, ...)
     perror("");
   } else {
     E("\n\nusage is: rlex [options] file");
-	  E("-f  for (f)ast. don't compress tables");
- 	  E("-h  suppress (h)eader comment that describes state machine");
-	  E("-H  print the (H)eader only");
-	  E("-l  suppress #(l)ine directives in the output");
-	  E("-t  send output to standard output instead of lex.yy.c");
-	  E("-v  (v)erbose mode, print statistics");
-	  E("-V  more (V)erbose, print internal diagnostics as rlex runs");
+    E("-f  for (f)ast. don't compress tables");
+    E("-h  suppress (h)eader comment that describes state machine");
+    E("-H  print the (H)eader only");
+    E("-l  suppress #(l)ine directives in the output");
+    E("-t  send output to standard output instead of lex.yy.c");
+    E("-v  (v)erbose mode, print statistics");
+    E("-V  more (V)erbose, print internal diagnostics as rlex runs");
   }
   
   va_end(args);
@@ -326,9 +326,9 @@ void do_file()
   
   if (Verbose) {
     printf("%d out of %d DFA states in minimized machine\n", nstates, DFA_MAX);
-	  printf("%d bytes required for minimized tables\n\n",
-		  nstates * MAX_CHARS * sizeof(TTYPE)		/* dtran  */
-	       + nstates * sizeof(TTYPE));		    /* accept */
+    printf("%d bytes required for minimized tables\n\n",
+        nstates * MAX_CHARS * sizeof(TTYPE)  /* dtran  */
+        + nstates * sizeof(TTYPE));          /* accept */
   }
 
   if (!No_header) {
@@ -352,8 +352,8 @@ void do_file()
       cnext(Ofile, DTRAN_NAME);
       if (Verbose) {
         printf("%d bytes required for column-compressed tables\n\n",
-		      i /* dtran      */
-		      + (nstates * sizeof(int))); /* Yyaccept  */
+            i                           /* dtran    */
+            + (nstates * sizeof(int))); /* Yyaccept */
       }
     }
 

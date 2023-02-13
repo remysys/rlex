@@ -188,10 +188,10 @@ char *getstr()
 
 int main(int argc, char *argv[])
 {
-  int	   nstates;		
-  ROW	   *dtran;		
-  ACCEPT *accept;		
-  int	   i;
+  int nstates;  
+  ROW *dtran;  
+  ACCEPT *accept;  
+  int i;
   Verbose = 2;
 
   nstates = min_dfa(getstr, &dtran, &accept );

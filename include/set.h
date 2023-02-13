@@ -2,16 +2,16 @@
 #define _SET_H
 
 #define _BITS_IN_INT 32         /* bits in one cell */
-#define _DEFSIZE 4			    /* cells in default set */
-#define _DEFBITS  (_DEFSIZE * _BITS_IN_INT)	 /* bits in default set */
+#define _DEFSIZE 4              /* cells in default set */
+#define _DEFBITS  (_DEFSIZE * _BITS_IN_INT)  /* bits in default set */
 
 typedef struct _set_
 {
-  unsigned int nsize;		        /* # size of map */
-  unsigned char compl;		    /* is a negative true set if true */
-  unsigned int nbits;		        /* number of bits in map */
-  unsigned int *map;		        /* pointer to the map */
-  unsigned int defmap[_DEFSIZE];	/* the map itself */
+  unsigned int nsize;            /* # size of map */
+  unsigned char compl;           /* is a negative true set if true */
+  unsigned int nbits;            /* number of bits in map */
+  unsigned int *map;             /* pointer to the map */
+  unsigned int defmap[_DEFSIZE]; /* the map itself */
 } SET;
 
 typedef int (*pset_t) (void* param, char *fmt, ...);

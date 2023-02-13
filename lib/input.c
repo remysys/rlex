@@ -161,8 +161,8 @@ int ii_advance()
   static int been_called = 0;
   if (!been_called) {
     /* push a newline into the empty buffer so that the lex start-of-line
-	   * anchor will work on the first input line.
-	   */
+     * anchor will work on the first input line.
+     */
     Next = sMark = eMark = END - 1;
     pMark = NULL;
     pLength = 0;
