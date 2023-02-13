@@ -3,8 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <compiler.h>
+#include <set.h>
 #include "globals.h"
 #include "dfa.h"
+#include "nfa.h"
 
 #define DTRAN_NAME "Yy_nxt" /* name used for DFA transition table. up to 
 				                     * 3 characters are appended to the end of

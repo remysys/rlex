@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <compiler.h>
+#include <set.h>
 #include "globals.h"
 #include "nfa.h"
 #include "dfa.h"

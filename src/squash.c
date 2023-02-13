@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <compiler.h>
+#include <set.h>
 #include "dfa.h"
 
 /* squash.c -- this module contains the routines to compress a table

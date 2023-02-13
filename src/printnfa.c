@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <compiler.h>
+#include <set.h>
 #include "nfa.h"
 
 /*--------------------------------------------------------------

@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <compiler.h>
+#include <limits.h>
+#include <hash.h>
 
 void *newsym(unsigned int size) 
 {
@@ -155,8 +156,35 @@ int ptab(HASH_TAB *tabp, ptab_t print, void *param, int sort)
 unsigned int hash_add(unsigned char *name)
 {
   unsigned int h ;
-  for(h = 0; *name ; h += *name++)
+  for (h = 0; *name; h += *name++)
     ;
+  return h;
+}
+
+
+unsigned int hash_bkdr(unsigned char *name)
+{
+  unsigned int h;
+  for (h = 0; *name; name++) {
+    h = *name + 31 * h;
+  }
+
+  return h;
+}
+
+/* a hash function for NUL-terminated char* strings using the method described by Bruno Haible.
+ * see http://www.haible.de/bruno/hashfunc.html 
+ */
+
+#define UNSIGNED_BITS (sizeof (unsigned int) * CHAR_BIT)
+
+unsigned int hash_pjw (unsigned char *name)
+{
+  unsigned int h;
+  
+  for (h = 0; *name; name++) {
+    h = *name + ((h << 9) | (h >> (UNSIGNED_BITS - 9)));
+  }   
   return h;
 }
 

@@ -26,6 +26,7 @@ int dfa( char *(*input_function)(void), ROW **dfap,  ACCEPT**	acceptp);         
 void pheader(FILE *fp, ROW dtran[], int nrows, ACCEPT *accept); /* print.c */
 void pdriver(FILE *output, int nrows, ACCEPT *accept);          /* print.c */
 
+int min_dfa(char *(*input_function)(void), ROW **dfap, ACCEPT **acceptp);  /* minimize.c */
 void lerror(int status, char *fmt, ...);        /* lex.c */
 int main(int argc, char *argv[]);               /* lex.c */
 

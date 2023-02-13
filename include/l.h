@@ -4,6 +4,7 @@
 /* ---------------- input.c ---------------- */
 
 void ii_io(int (*open_funct)(char *, int), int (*close_funct)(int), int (*read_funct)(int, void *, unsigned int)); 
+int ii_newfile (char *name);
 char *ii_text();
 int ii_length();
 int ii_lineno();

@@ -25,10 +25,10 @@ install:
 	sudo cp -fr ../include/l.h /usr/local/include/rlex/
 
 uninstall:
-	rm -fr /usr/local/bin/rlex
-	rm -fr /usr/local/lib64/lex.par
-	rm -fr /usr/local/lib64/liblex.a
-	rm -fr /usr/local/include/rlex
+	sudo rm -fr /usr/local/bin/rlex
+	sudo rm -fr /usr/local/lib64/lex.par
+	sudo rm -fr /usr/local/lib64/liblex.a
+	sudo rm -fr /usr/local/include/rlex
   
 #generate word count program
 

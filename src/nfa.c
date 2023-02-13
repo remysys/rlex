@@ -2,8 +2,11 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <ctype.h>
 #include <sys/types.h>
 #include <compiler.h>
+#include <set.h>
+#include <hash.h>
 #include "globals.h"
 #include "nfa.h"
 
@@ -565,6 +568,16 @@ void expr (NFA **startp, NFA **endp)
   }
 }
 
+int first_in_cat(TOKEN tok) {
+  switch (tok) {
+    case CLOSE_PAREN:
+    case AT_EOL: 
+    case OR:
+    case EOS: return 0;  
+  }
+
+  return 1;
+}
 
 void cat_expr(NFA **startp, NFA **endp)
 {
@@ -596,16 +609,6 @@ void cat_expr(NFA **startp, NFA **endp)
   }
 }
 
-int first_in_cat(TOKEN tok) {
-  switch (tok) {
-    case CLOSE_PAREN:
-    case AT_EOL: 
-    case OR:
-    case EOS: return 0;  
-  }
-
-  return 1;
-}
 
 void factor (NFA **startp , NFA **endp) {
 

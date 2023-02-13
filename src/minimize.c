@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <compiler.h>
+#include <set.h>
 #include "globals.h"
 #include "dfa.h"
 
