@@ -15,7 +15,7 @@ void *newsym(unsigned int size)
   }
 
   return (void *)(sym + 1);
-} 
+}
 
 void freesym(void *sym) 
 {
@@ -188,6 +188,7 @@ unsigned int hash_pjw (unsigned char *name)
   return h;
 }
 
+
 #ifdef  MAIN
 /*----------------------------------------------------------------------
  * The following test routines exercise the hash functions by building a table
@@ -201,14 +202,14 @@ unsigned int hash_pjw (unsigned char *name)
 
 typedef struct
 {
-  char          name[32]; /* hash key */
-  char          str[16];  /* used for error checking */
-  unsigned int  hval;     /* hash value of name, also " */
+  char          name[32]; /* hash key                        */
+  char          str[16];  /* used for error checking         */
+  unsigned int  hval;     /* hash value of name, also "      */
   int           count;    /* # of times word was encountered */
 } STAB;
 
 void printword(void *sp, ...) {
-  printf("name: %s\tstr: %s\thval: %u\n", ((STAB *)sp)->name, ((STAB *)sp)->str, ((STAB *)sp)->hval);
+  printf("name: %s  str: %s  hval: %u\n", ((STAB *)sp)->name, ((STAB *)sp)->str, ((STAB *)sp)->hval);
 }
 
 int getword(char *buf)
@@ -219,13 +220,13 @@ int getword(char *buf)
   int num_letters, let;
 
   if(--wordnum < 0)
-      return 0;
+    return 0;
 
   while((num_letters = rand() % 16)  < 3)
-      ;
+    ;
 
   while(--num_letters >= 0) {
-    let = (rand() % 26) + 'a'; /* 26 letters in english */
+    let = (rand() % 26) + 'a' ; /* 26 letters in english */
     *buf++ = (rand() % 10) ? let : toupper(let) ;
   }
 

@@ -7,8 +7,8 @@ CFLAGS = -I$(INCLUDE)
 
 .PHONY: all clean
 
-L_OBJ  = input.o ferr.o yymain.o yywrap.o yyinitlex.o
-COMP_OBJ = hash.o set.o escape.o printutils.o ferr.o
+L_OBJ  = ferr.o input.o yymain.o yywrap.o yyinitlex.o yyinitox.o
+COMP_OBJ = hash.o set.o escape.o printutils.o ferr.o fputstr.o printv.o
 
 all: $(LIBL) $(LIBCOMP)
 
@@ -23,10 +23,10 @@ $(LIBCOMP): $(COMP_OBJ)
 # the objects that follow are the lex run-time library
 
 input.o:     input.c
-ferr.o:      ferr.c
 yymain.o:    yymain.c
 yywrap.o:    yywrap.c
 yyinitlex.o: yyinitlex.c
+yyinitox.o:  yyinitox.c
 
 # the following routines are used by lex, but not by the
 # programs that lex generate
@@ -36,6 +36,8 @@ set.o:        set.c
 escape.o:     escape.c
 printutils.o: printutils.c
 ferr.o:       ferr.c
+fputstr.o:    fputstr.c
+printv.o:     printv.c
 
 clean:
 	rm -fr $(L_OBJ) $(LIBL)

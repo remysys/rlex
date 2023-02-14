@@ -7,8 +7,7 @@ CFLAGS = -I$(INCLUDE) -g
 .PHONY: all clean test install uninstall
 all: rlex
 
-OBJS = lex.o squash.o printnfa.o print.o nfa.o minimize.o \
-	egrep.o dfa.o 
+OBJS = lex.o squash.o printnfa.o print.o nfa.o minimize.o egrep.o dfa.o 
 
 lib:
 	make -C ../lib

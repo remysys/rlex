@@ -243,7 +243,7 @@ void _set_op(int op, SET *dest, SET *src)
       }
       break;
     
-    case _ASSIGN: 
+    case _ASSIGN:
       while(--ssize >= 0) {
         *d++ = *s++;
       }
@@ -475,7 +475,7 @@ int main()
   for(i = 0; i < 40; i++) {
     printf("Set %d: ", i);
     pset(a[i], (pset_t) fprintf, stdout);
-    printf(i & 1 ? "\n" : "\t");
+    printf(i & 1 ? "\n" : "  ");
   }
 
   qsort(a, 40, sizeof(a[0]), scmp);
@@ -484,7 +484,7 @@ int main()
   for(i = 0; i < 40; i++) {
     printf("Set %d: ", i);
     pset(a[i], (pset_t) fprintf, stdout);
-    printf( i & 1 ? "\n" : "\t");
+    printf( i & 1 ? "\n" : "  ");
   }
   return 0;
 }

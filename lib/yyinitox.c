@@ -1,0 +1,1 @@
+void yy_init_rbison(void *tos) {}
