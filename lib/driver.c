@@ -3,9 +3,9 @@
 #include <ctype.h>
 #include <compiler.h>
 
-static FILE *Input_file = NULL;   /* lex.par default */
+static FILE *Input_file = NULL;
 static int Input_line;              /* line number of most-recently read line */
-static char File_name[128];
+static char File_name[128];         /* template-file name */
 
 
 FILE *driver_1(FILE *output, int lines, char *file_name)

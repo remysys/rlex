@@ -11,25 +11,19 @@
 #define INBOUNDS(a, p) (!(TOOHIGH(a,p) || TOOLOW(a,p)))
 
 /* ---------------- lib/ferr.c ---------------- */
-extern int ferr(char *fmt, ...);
-
-/* ---------------- lib/fputstr.c ---------------- */
-extern void fputstr (char *str, int maxlen, FILE *fp);
+int ferr(char *fmt, ...);
 
 /* ---------------- lib/printv.c ---------------- */
-extern void printv(FILE *fp, char *argv[]);
-extern void comment(FILE *fp, char *argv[]);
+void printv(FILE *fp, char *argv[]);
+void comment(FILE *fp, char *argv[]);
+void print_array(FILE *fp, int *array, int nrows, int ncols);
+void fputstr (char *str, int maxlen, FILE *fp);
 
 /* ---------------- lib/escape.c ---------------- */
 int hex2bin(int c);
 int oct2bin(int c);
 int esc(char **s);
 char *bin_to_ascii(int c, int use_hex);
-
-/* ---------------- lib/printutils.c ---------------- */
-void comment(FILE *fp, char *argv[]);
-void print_array(FILE *fp, int *array, int nrows, int ncols);
-void fputstr (char *str, int maxlen, FILE *fp);
 
 /* ---------------- lib/driver.c ---------------- */
 FILE *driver_1(FILE *output, int lines, char *file_name);
