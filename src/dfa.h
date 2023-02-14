@@ -35,7 +35,4 @@ char *get_expr();                               /*lex.c */
 int squash(FILE *fp, ROW *dtran, int nrows, int ncols, char *name);  /* squash.c */
 void cnext(FILE *fp, char *name);                                    /* squash.c */
 
-FILE *driver_1(FILE *output, int lines);            /* driver.c */
-int driver_2(FILE *output, int lines);              /* driver.c */
-
 #endif

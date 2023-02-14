@@ -8,7 +8,7 @@ CFLAGS = -I$(INCLUDE)
 .PHONY: all clean
 
 L_OBJ  = ferr.o input.o yymain.o yywrap.o yyinitlex.o yyinitox.o
-COMP_OBJ = hash.o set.o escape.o printutils.o ferr.o fputstr.o printv.o
+COMP_OBJ = hash.o set.o escape.o printutils.o ferr.o fputstr.o printv.o driver.o
 
 all: $(LIBL) $(LIBCOMP)
 
@@ -38,6 +38,7 @@ printutils.o: printutils.c
 ferr.o:       ferr.c
 fputstr.o:    fputstr.c
 printv.o:     printv.c
+driver.o:     driver.c
 
 clean:
 	rm -fr $(L_OBJ) $(LIBL)
