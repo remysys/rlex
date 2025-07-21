@@ -10,17 +10,21 @@ static char File_name[128];         /* template-file name */
 
 FILE *driver_1(FILE *output, int lines, char *file_name)
 {
-  char install_path[128] = "/usr/local/lib64/";
+  char fullpath[128];
 
   if (!(Input_file = fopen(file_name, "r"))) {
-    file_name = strcat(install_path, file_name);
-
-    if (!(Input_file = fopen(file_name, "r"))) {
-      return NULL;
+    snprintf(fullpath, sizeof(fullpath), "/usr/local/lib64/%s", file_name);
+    if (!(Input_file = fopen(fullpath, "r"))) {
+      snprintf(fullpath, sizeof(fullpath), "/usr/local/lib/%s", file_name);
+      if (!(Input_file = fopen(fullpath, "r"))) {
+        return NULL;
+      }
     }
+    strncpy(File_name, fullpath, sizeof(File_name));
+  } else {
+    strncpy(File_name, file_name, sizeof(File_name));
   }
 
-  strncpy(File_name, file_name, sizeof(File_name) );
   Input_line = 0;
   driver_2(output, lines);
   return Input_file;

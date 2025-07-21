@@ -33,13 +33,11 @@ $ ./wc lex.c
 alternatively, run `make test` to build and test the `wc` example
 ```
 $ make test
-running wc (short for word count) test
 generating lex.yy.c from wc.lex
 ./rlex ../test/wc.lex
-rlex 0.02 [gcc 12.2.0] [Jul 22 2025]. (c) 2025, ****. all rights reserved.
 compiling lex.yy.c into executable wc
-gcc -o wc lex.yy.c ../lib/libl.a
-running wc on lex.c
+gcc -I../include -g -o wc lex.yy.c ../lib/libl.a
+running wc test (word count on lex.c)
 ./wc lex.c
 412     1417    11246   lex.c
 ```
