@@ -4,7 +4,7 @@ CFLAGS = -I$(INCLUDE) -g
 
 #CFLAGS = -I$(INCLUDE) -DMAIN
 
-.PHONY: all clean test install uninstall
+.PHONY: all clean test
 all: rlex
 
 OBJS = lex.o squash.o printnfa.o print.o nfa.o minimize.o egrep.o dfa.o 
@@ -14,25 +14,17 @@ lib:
 
 rlex: $(OBJS) lib
 	gcc -o $@ $(OBJS) ../lib/libcomp.a
-
-
-install:
-	sudo cp -fr rlex /usr/local/bin/
-	sudo cp -fr lex.par /usr/local/lib64/
-	sudo cp -fr ../lib/libl.a /usr/local/lib64/
-	sudo cp -fr ../include/l.h /usr/local/include/
-
-uninstall:
-	sudo rm -fr /usr/local/bin/rlex
-	sudo rm -fr /usr/local/lib64/lex.par
-	sudo rm -fr /usr/local/lib64/libl.a
-	sudo rm -fr /usr/local/include/l.h
   
 #generate word count program
 
 test:
-	rlex ../test/wc.lex
-	gcc -o wc lex.yy.c -ll
+	@echo "running wc (short for word count) test"
+	@echo "generating lex.yy.c from wc.lex"
+	./rlex ../test/wc.lex
+	@echo "compiling lex.yy.c into executable wc"
+	gcc -o wc lex.yy.c ../lib/libl.a
+	@echo "running wc on lex.c"
+	./wc lex.c
 
 clean:
 	rm -fr *.o

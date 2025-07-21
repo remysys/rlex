@@ -1,4 +1,4 @@
-/* wordcount just like unix wc */
+/* word count tool similar to the Linux/Unix wc utility */
 %{
 #include <string.h>
 

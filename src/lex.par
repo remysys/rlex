@@ -32,7 +32,7 @@ int   yylineno;
 FILE *yyout;
 
 /*-----------------------------------------------------------------
- * macros that duplicate functions in UNIX lex:
+ * macros that duplicate functions in Linux/Unix utility lex:
  */
 #define output(c) putc(c, yyout)
 #define ECHO fprintf(yyout, "%s", yytext)
@@ -50,7 +50,7 @@ FILE *yyout;
                 )
 
 
-int input(void) /* this is a macro in unix lex */
+int input(void) /* this is a macro in Linux/Unix utility lex */
 {
   int c;
   if ((c = ii_input()) && (c != -1)) {

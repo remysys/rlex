@@ -23,13 +23,13 @@ typedef struct dfa_state
   char *accept;         /* accept action if accept state */
   int anchor;           /* anchor point if an accept state */
   SET *set;             /* set of NFA states represented by */
-} DFA_STATE;          /* this DFA state */
+} DFA_STATE;            /* this DFA state */
 
 
-DFA_STATE *Dstates; /* DFA states table */
-ROW *Dtran;         /* DFA transition table */
-int Nstates;        /* number of DFA states */
-DFA_STATE *Last_marked; /* most-recently marked DFA state in Dtran */
+DFA_STATE *Dstates;       /* DFA states table */
+ROW *Dtran;               /* DFA transition table */
+static int Nstates = 0;   /* number of DFA states */
+DFA_STATE *Last_marked;   /* most-recently marked DFA state in Dtran */
 
 
 int add_to_dstates(SET *NFA_set, char *accept_string, int anchor) 

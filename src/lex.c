@@ -30,7 +30,7 @@ static int No_compression  = 0;
 static int No_header       = 0;
 static int Header_only     = 0;
 
-#define VERSION "0.01 [gcc 4.8.5]"
+#define RLEX_VERISON "0.02"
 
 void lerror(int status, char *fmt, ...)
 {
@@ -176,7 +176,7 @@ void signon()
     screen = stderr;
   }
 
-  fprintf(screen, "rlex %s [%s]. (c) %s, ****.", VERSION, __DATE__,  __DATE__ + 7);
+  fprintf(screen, "rlex %s [gcc %s] [%s]. (c) %s, ****.", RLEX_VERISON, __VERSION__, __DATE__,  __DATE__ + 7);
   fprintf(screen," all rights reserved.\n");
 
   if (screen != stderr) {

@@ -59,7 +59,7 @@ char *Warnmsgs[] = /* indexed by WARN_NUM */
 };
 
 NFA *Nfa_states; 
-int Nstates = 0;
+static int Nstates = 0;
 int Next_alloc;
 
 // stack
