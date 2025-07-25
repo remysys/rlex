@@ -1,6 +1,6 @@
-`rlex`: a clear and simple alternative to Linux `flex`
+`rlex`: a clear and simple alternative to GNU `flex`
 ===
-`rlex` is a clear and simple alternative to Linux `flex` - a tool for generating lexical analyzers (scanners). `rlex` supports the lexical rules of the C95 standard.
+`rlex` is a clear and simple alternative to GNU `flex` - a tool for generating lexer. with a clean and small codebase, `rlex` is easy to read, understand, and extend - great for learning and exploring how lexer work.
 
 ![rlex internals](doc/rlex.png)
 
